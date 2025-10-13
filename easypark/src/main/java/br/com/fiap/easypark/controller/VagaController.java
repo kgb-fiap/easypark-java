@@ -2,6 +2,7 @@ package br.com.fiap.easypark.controller;
 
 import br.com.fiap.easypark.dto.VagaInDto;
 import br.com.fiap.easypark.dto.VagaOutDto;
+import br.com.fiap.easypark.dto.VagaStatusOutDto;
 import br.com.fiap.easypark.entities.enums.StatusVaga;
 import br.com.fiap.easypark.services.VagaService;
 import jakarta.validation.Valid;
@@ -48,15 +49,12 @@ public class VagaController {
     }
 
     @GetMapping("/vagas/{id}/status")
-    public ResponseEntity<?> status(@PathVariable Long id) {
+    public ResponseEntity<VagaStatusOutDto> status(@PathVariable Long id) {
         var st = service.getStatus(id);
-        if (st == null) return ResponseEntity.ok(Map.of("vagaId", id, "status", "DESCONHECIDO"));
-        return ResponseEntity.ok(Map.of(
-                "vagaId", st.getVagaId(),
-                "status", st.getStatusOcupacao(),
-                "ultimoOcorrido", st.getUltimoOcorrido(),
-                "sensorId", st.getSensorId()
-        ));
+        var dto = (st == null)
+                ? new VagaStatusOutDto(id, "DESCONHECIDO", null, null)
+                : new VagaStatusOutDto(st.getVagaId(), st.getStatusOcupacao(), st.getUltimoOcorrido(), st.getSensorId());
+        return ResponseEntity.ok(dto);
     }
 
     @GetMapping("/estacionamentos/{estacionamentoId}/vagas")

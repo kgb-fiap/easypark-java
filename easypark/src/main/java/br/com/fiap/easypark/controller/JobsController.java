@@ -1,6 +1,8 @@
 
 package br.com.fiap.easypark.controller;
 
+import br.com.fiap.easypark.dto.EtaUpdateOutDto;
+import br.com.fiap.easypark.dto.JobCountOutDto;
 import br.com.fiap.easypark.services.ReservaJobsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,20 +17,20 @@ public class JobsController {
     private final ReservaJobsService jobs;
 
     @PostMapping("/reservas/timeouts")
-    public Map<String, Object> reservaTimeouts() {
+    public JobCountOutDto reservaTimeouts() {
         int n = jobs.runReservaTimeouts();
-        return Map.of("canceladas", n);
+        return new JobCountOutDto(n);
     }
 
     @PostMapping("/prereservas/timeouts")
-    public Map<String, Object> preReservaTimeouts() {
+    public JobCountOutDto preReservaTimeouts() {
         int n = jobs.runPreReservaTimeouts();
-        return Map.of("canceladas", n);
+        return new JobCountOutDto(n);
     }
 
     @PostMapping("/reservas/{id}/eta")
-    public ResponseEntity<?> atualizarEta(@PathVariable long id, @RequestParam int minutos) {
+    public EtaUpdateOutDto atualizarEta(@PathVariable long id, @RequestParam int minutos) {
         var out = jobs.updateEta(id, minutos);
-        return ResponseEntity.ok(out);
+        return new EtaUpdateOutDto(out.get("status"), out.get("msg"));
     }
 }
