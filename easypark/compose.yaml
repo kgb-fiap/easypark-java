@@ -1,0 +1,11 @@
+services:
+  java-app:
+    build:
+      context: .
+    env_file:
+      - .env
+    container_name: java-app
+    restart: unless-stopped
+    init: true
+    ports:
+      - "8080:8080"
