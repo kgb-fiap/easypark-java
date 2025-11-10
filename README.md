@@ -212,7 +212,7 @@ spring.datasource.password=${DB_EASYPARK_PASS}
 - API **REST** com **POO/JPA/Hibernate**.  
 - **Maturidade REST nível 1** atingida.  
 - **GitHub público**, documentação e **Swagger/OpenAPI**.  
-- **Testes de endpoints** (Postman) — **PREENCHER** links/arquivos.
+- **Testes de endpoints** (Postman).
 
 ### Sprint 2
 - **Evolução do código** (refatorações, padrão de respostas, exceções).  
@@ -223,7 +223,7 @@ spring.datasource.password=${DB_EASYPARK_PASS}
 - [ ] DER (PNG) e Arquitetura (PNG) em `docs/`  
 - [ ] Cronograma/Responsáveis em `docs/cronograma-s1-s2.pdf`  
 - [ ] Coleção Postman em `docs/postman/`  
-- [ ] Link de vídeo de apresentação *(PREENCHER)*
+- [ ] Link de vídeo de apresentação 
 
 ---
 
