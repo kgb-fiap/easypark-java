@@ -16,14 +16,11 @@
 - [Como Executar Localmente](#como-executar-localmente)
 - [Documentação da API (Swagger/OpenAPI)](#documentação-da-api-swaggeropenapi)
 - [Padrões REST e HATEOAS](#padrões-rest-e-hateoas)
-- [Testes (Postman/Insomnia)](#testes-postmaninsomnia)
+- [Testes (Postman)](#testes-postmaninsomnia)
 - [Evolução Sprint 1 → Sprint 2](#evolução-sprint-1--sprint-2)
-- [Atendimento às Exigências das Sprints](#atendimento-às-exigências-das-sprints)
 - [Equipe](#equipe)
 - [Roadmap (Sprints 3 e 4)](#roadmap-sprints-3-e-4)
-- [Licença](#licença)
 - [Anexos (Diagramas)](#anexos-diagramas)
-- [Itens a Preencher](#itens-a-preencher)
 
 ---
 
