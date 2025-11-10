@@ -1,5 +1,6 @@
 package br.com.fiap.easypark.services.impl;
 
+import br.com.fiap.easypark.dto.PageResponse;
 import br.com.fiap.easypark.dto.VagaInDto;
 import br.com.fiap.easypark.dto.VagaOutDto;
 import br.com.fiap.easypark.entities.Nivel;
@@ -13,9 +14,11 @@ import br.com.fiap.easypark.repositories.TipoVagaRepository;
 import br.com.fiap.easypark.repositories.VagaRepository;
 import br.com.fiap.easypark.repositories.VagaStatusRepository;
 import br.com.fiap.easypark.services.VagaService;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import br.com.fiap.easypark.entities.enums.StatusVaga;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -39,6 +42,22 @@ public class VagaServiceImpl implements VagaService {
         this.nivelRepo = nivelRepo;
         this.tipoRepo = tipoRepo;
         this.mapper = mapper;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PageResponse<VagaOutDto> search(StatusVaga status, Long nivelId, Long tipoVagaId, Long estacionamentoId, Pageable pageable) {
+        Page<Vaga> page = vagaRepo.search(status, nivelId, tipoVagaId, estacionamentoId, pageable); // <— aqui
+        var content = page.getContent().stream().map(mapper::toOut).toList();
+        return new PageResponse<>(
+                content,
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalElements(),
+                page.getTotalPages(),
+                page.isFirst(),
+                page.isLast()
+        );
     }
 
     @Transactional

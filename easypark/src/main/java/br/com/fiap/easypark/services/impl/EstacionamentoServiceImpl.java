@@ -2,6 +2,7 @@ package br.com.fiap.easypark.services.impl;
 
 import br.com.fiap.easypark.dto.EstacionamentoInDto;
 import br.com.fiap.easypark.dto.EstacionamentoOutDto;
+import br.com.fiap.easypark.dto.PageResponse;
 import br.com.fiap.easypark.entities.Endereco;
 import br.com.fiap.easypark.entities.Estacionamento;
 import br.com.fiap.easypark.entities.Operadora;
@@ -11,6 +12,7 @@ import br.com.fiap.easypark.repositories.EstacionamentoRepository;
 import br.com.fiap.easypark.repositories.EnderecoRepository;
 import br.com.fiap.easypark.repositories.OperadoraRepository;
 import br.com.fiap.easypark.services.EstacionamentoService;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +34,18 @@ public class EstacionamentoServiceImpl implements EstacionamentoService {
         this.operadoraRepository = operadoraRepository;
         this.enderecoRepository = enderecoRepository;
         this.mapper = mapper;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PageResponse<EstacionamentoOutDto> findAll(Pageable pageable) {
+        var page = repository.findAll(pageable);
+        var content = page.getContent().stream().map(mapper::toOut).toList();
+        return new PageResponse<>(
+                content, page.getNumber(), page.getSize(),
+                page.getTotalElements(), page.getTotalPages(),
+                page.isFirst(), page.isLast()
+        );
     }
 
     @Transactional

@@ -2,6 +2,7 @@ package br.com.fiap.easypark.controller;
 
 import br.com.fiap.easypark.dto.EstacionamentoInDto;
 import br.com.fiap.easypark.dto.EstacionamentoOutDto;
+import br.com.fiap.easypark.dto.PageResponse;
 import br.com.fiap.easypark.services.EstacionamentoService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 
 import java.util.List;
 
@@ -27,15 +30,17 @@ public class EstacionamentoController {
         this.service = service;
     }
 
+    @GetMapping
+    public ResponseEntity<PageResponse<EstacionamentoOutDto>> list(
+            @PageableDefault(size = 20, sort = "nome") Pageable pageable
+    ) {
+        return ResponseEntity.ok(service.findAll(pageable));
+    }
+
     @PostMapping
     public ResponseEntity<EstacionamentoOutDto> create(@RequestBody @Valid EstacionamentoInDto in) {
         var saved = service.create(in);
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
-    }
-
-    @GetMapping
-    public ResponseEntity<List<EstacionamentoOutDto>> list() {
-        return ResponseEntity.ok(service.findAll());
     }
 
     @GetMapping("/{id}")
