@@ -1,4 +1,4 @@
-# EasyPark — API Java (Spring Boot + Oracle)
+# EasyPark — API Java
 
 > Sistema multi-estacionamento com **reservas em estágios** (PRE_RESERVA → RESERVA → OCUPADA → PAGA/CANCELADA), **monitoramento em tempo real** via sensores de vaga e **pagamento pós-uso**. Integra com **Oracle** e usa **ETA** (Google Maps Directions) para promover PRE_RESERVA → RESERVA.
 
