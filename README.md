@@ -250,6 +250,8 @@ spring.datasource.password=${DB_EASYPARK_PASS}
 ---
 
 ## Anexos (Diagramas)
+### Diagrama de classe
+> `docs/diagrama-classe-easypark.png`.
 
 ### DER — PlantUML 
 > Inserir imagem `docs/der-easypark.png`.
