@@ -108,7 +108,6 @@ stateDiagram-v2
 - **Oracle** (JDBC, HikariCP)  
 - **springdoc-openapi** (Swagger UI)  
 - **Lombok** 
-- **(Opcional)** Docker / Docker Compose
 
 ---
 
