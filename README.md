@@ -36,16 +36,12 @@ O **EasyPark** é um backend REST que orquestra:
 ---
 
 ## Arquitetura
-> PREENCHER `docs/arquitetura-easypark.png`
-
-![Arquitetura EasyPark](docs/arquitetura-easypark.png)
+> `docs/arquitetura-easypark.png`
 
 ---
 
 ## Domínio e Modelo de Dados
 > DER (imagem): `docs/der-easypark.png`.
-
-![DER EasyPark](docs/der-easypark.png)
 
 ### Principais entidades (propósito)
 | Entidade | Propósito (resumo) |
@@ -127,7 +123,7 @@ stateDiagram-v2
 ### 2) Banco de dados
 Crie um schema e aplique o DDL (tabelas, FKs, índices, sequences/triggers).
 
-- **Scripts**: `docs/sql/ddl-easypark.sql` *(PREENCHER)*  
+- **Scripts**: `docs/sql/ddl-easypark.sql` 
 
 ### 3) Configuração da aplicação
 
@@ -184,8 +180,8 @@ spring.datasource.password=${DB_EASYPARK_PASS}
 
 ## Testes (Postman/Insomnia)
 
-- `docs/postman/EasyPark.postman_collection.json` *(PREENCHER)*  
-- `docs/postman/EasyPark-local.postman_environment.json` *(PREENCHER)*
+- `docs/postman/EasyPark.postman_collection.json` 
+- `docs/postman/EasyPark-local.postman_environment.json` 
 
 **Como usar**
 1. Importar a coleção e o ambiente.  
@@ -216,7 +212,7 @@ spring.datasource.password=${DB_EASYPARK_PASS}
 - API **REST** com **POO/JPA/Hibernate**.  
 - **Maturidade REST nível 1** atingida.  
 - **GitHub público**, documentação e **Swagger/OpenAPI**.  
-- **Testes de endpoints** (Postman) — **PREENCHER** links/arquivos.
+- **Testes de endpoints** (Postman).
 
 ### Sprint 2
 - **Evolução do código** (refatorações, padrão de respostas, exceções).  
@@ -227,7 +223,7 @@ spring.datasource.password=${DB_EASYPARK_PASS}
 - [ ] DER (PNG) e Arquitetura (PNG) em `docs/`  
 - [ ] Cronograma/Responsáveis em `docs/cronograma-s1-s2.pdf`  
 - [ ] Coleção Postman em `docs/postman/`  
-- [ ] Link de vídeo de apresentação *(PREENCHER)*
+- [ ] Link de vídeo de apresentação 
 
 ---
 
@@ -254,7 +250,7 @@ spring.datasource.password=${DB_EASYPARK_PASS}
 > `docs/diagrama-classe-easypark.png`.
 
 ### DER — PlantUML 
-> Inserir imagem `docs/der-easypark.png`.
+> `docs/der-easypark.png`.
 
 ```plantuml
 @startuml
