@@ -1,16 +1,18 @@
 package br.com.fiap.easypark.services;
 
-import jakarta.persistence.*;
-import lombok.RequiredArgsConstructor;
+import br.com.fiap.easypark.dto.EtaUpdateOutDto;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.ParameterMode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Map;
-
-@RequiredArgsConstructor
 @Service
 public class ReservaJobsService {
-    @PersistenceContext private final EntityManager em;
+    private final EntityManager em;
+
+    public ReservaJobsService(EntityManager em) {
+        this.em = em;
+    }
 
     @Transactional
     public int runReservaTimeouts() {
@@ -29,7 +31,7 @@ public class ReservaJobsService {
     }
 
     @Transactional
-    public Map<String,String> updateEta(long reservaId, int etaMinutos) {
+    public EtaUpdateOutDto updateEta(long reservaId, int etaMinutos) {
         var sp = em.createStoredProcedureQuery("user_eta_update_process");
         sp.registerStoredProcedureParameter("p_reserva_id", Long.class, ParameterMode.IN);
         sp.registerStoredProcedureParameter("p_eta_minutos", Integer.class, ParameterMode.IN);
@@ -38,9 +40,9 @@ public class ReservaJobsService {
         sp.setParameter("p_reserva_id", reservaId);
         sp.setParameter("p_eta_minutos", etaMinutos);
         sp.execute();
-        return Map.of(
-                "status", (String) sp.getOutputParameterValue("p_status"),
-                "msg", (String) sp.getOutputParameterValue("p_msg")
+        return new EtaUpdateOutDto(
+                (String) sp.getOutputParameterValue("p_status"),
+                (String) sp.getOutputParameterValue("p_msg")
         );
     }
 }

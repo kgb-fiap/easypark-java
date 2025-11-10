@@ -6,46 +6,48 @@ import br.com.fiap.easypark.dto.VagaStatusOutDto;
 import br.com.fiap.easypark.entities.enums.StatusVaga;
 import br.com.fiap.easypark.services.VagaService;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
-@RequiredArgsConstructor
 @RestController
 @RequestMapping
 public class VagaController {
 
     private final VagaService service;
 
+    public VagaController(VagaService service) {
+        this.service = service;
+    }
+
     @PostMapping("/vagas")
-    @ResponseStatus(HttpStatus.CREATED)
-    public VagaOutDto create(@RequestBody @Valid VagaInDto in) {
-        return service.create(in);
+    public ResponseEntity<VagaOutDto> create(@RequestBody @Valid VagaInDto in) {
+        var saved = service.create(in);
+        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
     @GetMapping("/vagas")
-    public List<VagaOutDto> list(@RequestParam(required = false) StatusVaga status) {
-        return status != null ? service.findByStatus(status) : service.findAll();
+    public ResponseEntity<List<VagaOutDto>> list(@RequestParam(required = false) StatusVaga status) {
+        var list = status != null ? service.findByStatus(status) : service.findAll();
+        return ResponseEntity.ok(list);
     }
 
     @GetMapping("/vagas/{id}")
-    public VagaOutDto get(@PathVariable Long id) {
-        return service.findById(id);
+    public ResponseEntity<VagaOutDto> get(@PathVariable Long id) {
+        return ResponseEntity.ok(service.findById(id));
     }
 
     @PutMapping("/vagas/{id}")
-    public VagaOutDto update(@PathVariable Long id, @RequestBody @Valid VagaInDto in) {
-        return service.update(id, in);
+    public ResponseEntity<VagaOutDto> update(@PathVariable Long id, @RequestBody @Valid VagaInDto in) {
+        return ResponseEntity.ok(service.update(id, in));
     }
 
     @DeleteMapping("/vagas/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.delete(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/vagas/{id}/status")
@@ -58,7 +60,7 @@ public class VagaController {
     }
 
     @GetMapping("/estacionamentos/{estacionamentoId}/vagas")
-    public List<VagaOutDto> listByEstacionamento(@PathVariable Long estacionamentoId) {
-        return service.findByEstacionamento(estacionamentoId);
+    public ResponseEntity<List<VagaOutDto>> listByEstacionamento(@PathVariable Long estacionamentoId) {
+        return ResponseEntity.ok(service.findByEstacionamento(estacionamentoId));
     }
 }

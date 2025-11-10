@@ -1,28 +1,38 @@
-
 package br.com.fiap.easypark.services.impl;
 
 import br.com.fiap.easypark.dto.EstacionamentoInDto;
 import br.com.fiap.easypark.dto.EstacionamentoOutDto;
+import br.com.fiap.easypark.entities.Endereco;
 import br.com.fiap.easypark.entities.Estacionamento;
 import br.com.fiap.easypark.entities.Operadora;
 import br.com.fiap.easypark.exceptions.EntityNotFoundException;
 import br.com.fiap.easypark.mappers.EstacionamentoMapper;
 import br.com.fiap.easypark.repositories.EstacionamentoRepository;
+import br.com.fiap.easypark.repositories.EnderecoRepository;
 import br.com.fiap.easypark.repositories.OperadoraRepository;
 import br.com.fiap.easypark.services.EstacionamentoService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@RequiredArgsConstructor
 @Service
 public class EstacionamentoServiceImpl implements EstacionamentoService {
 
     private final EstacionamentoRepository repository;
     private final OperadoraRepository operadoraRepository;
+    private final EnderecoRepository enderecoRepository;
     private final EstacionamentoMapper mapper;
+
+    public EstacionamentoServiceImpl(EstacionamentoRepository repository,
+                                     OperadoraRepository operadoraRepository,
+                                     EnderecoRepository enderecoRepository,
+                                     EstacionamentoMapper mapper) {
+        this.repository = repository;
+        this.operadoraRepository = operadoraRepository;
+        this.enderecoRepository = enderecoRepository;
+        this.mapper = mapper;
+    }
 
     @Transactional
     @Override
@@ -30,7 +40,10 @@ public class EstacionamentoServiceImpl implements EstacionamentoService {
         Operadora op = operadoraRepository.findById(in.operadoraId())
                 .orElseThrow(() -> new EntityNotFoundException("Operadora " + in.operadoraId() + " não encontrada"));
 
-        Estacionamento saved = repository.save(mapper.toEntity(in, op));
+        Endereco endereco = enderecoRepository.findById(in.enderecoId())
+                .orElseThrow(() -> new EntityNotFoundException("Endereco " + in.enderecoId() + " não encontrado"));
+
+        Estacionamento saved = repository.save(mapper.toEntity(in, op, endereco));
         return mapper.toOut(saved);
     }
 
@@ -55,7 +68,10 @@ public class EstacionamentoServiceImpl implements EstacionamentoService {
         Operadora op = operadoraRepository.findById(in.operadoraId())
                 .orElseThrow(() -> new EntityNotFoundException("Operadora " + in.operadoraId() + " não encontrada"));
 
-        mapper.update(e, in, op);
+        Endereco endereco = enderecoRepository.findById(in.enderecoId())
+                .orElseThrow(() -> new EntityNotFoundException("Endereco " + in.enderecoId() + " não encontrado"));
+
+        mapper.update(e, in, op, endereco);
         return mapper.toOut(e);
     }
 

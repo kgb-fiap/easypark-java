@@ -13,14 +13,13 @@ import br.com.fiap.easypark.repositories.TipoVagaRepository;
 import br.com.fiap.easypark.repositories.VagaRepository;
 import br.com.fiap.easypark.repositories.VagaStatusRepository;
 import br.com.fiap.easypark.services.VagaService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import br.com.fiap.easypark.entities.enums.StatusVaga;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@RequiredArgsConstructor
+
 @Service
 public class VagaServiceImpl implements VagaService {
 
@@ -29,6 +28,18 @@ public class VagaServiceImpl implements VagaService {
     private final NivelRepository nivelRepo;
     private final TipoVagaRepository tipoRepo;
     private final VagaMapper mapper;
+
+    public VagaServiceImpl(VagaRepository vagaRepo,
+                           VagaStatusRepository statusRepo,
+                           NivelRepository nivelRepo,
+                           TipoVagaRepository tipoRepo,
+                           VagaMapper mapper) {
+        this.vagaRepo = vagaRepo;
+        this.statusRepo = statusRepo;
+        this.nivelRepo = nivelRepo;
+        this.tipoRepo = tipoRepo;
+        this.mapper = mapper;
+    }
 
     @Transactional
     @Override
