@@ -219,10 +219,10 @@ spring.datasource.password=${DB_EASYPARK_PASS}
 - **Gestão de configuração** contínua (GitHub, versionamento).
 
 **Checklist de entrega**
-- [ ] DER (PNG) e Arquitetura (PNG) em `docs/`  
+- [x] DER (PNG) e Arquitetura (PNG) em `docs/`  
 - [ ] Cronograma/Responsáveis em `docs/cronograma-s1-s2.pdf`  
-- [ ] Coleção Postman em `docs/postman/`  
-- [ ] Link de vídeo de apresentação 
+- [x] Coleção Postman em `docs/postman/`  
+- [x] Link de vídeo de apresentação ([EasyPark - Pitch](https://youtu.be/lVp7S25vAQ8?si=YolhGwtarLyjFa1c))
 
 ---
 
