@@ -478,3 +478,9 @@ endlegend
 ```
 
 ---
+
+## Integrantes
+
+- **Gabriel Cruz Ferreira** — RM559613  
+- **Kauã Ferreira dos Santos** — RM560992  
+- **Vinicius da Silva Bitú** — RM560227 
