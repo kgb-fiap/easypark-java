@@ -30,6 +30,10 @@ public class EstacionamentoMapper {
     }
 
     public EstacionamentoOutDto toOut(Estacionamento e) {
+        return toOut(e, 0L);
+    }
+
+    public EstacionamentoOutDto toOut(Estacionamento e, Long totalVagas) {
         Endereco endereco = e.getEndereco();
         EnderecoResumoOutDto enderecoResumo = null;
         if (endereco != null) {
@@ -37,7 +41,9 @@ public class EstacionamentoMapper {
                     endereco.getId(),
                     endereco.getCep(),
                     endereco.getLogradouro(),
-                    endereco.getNumero()
+                    endereco.getNumero(),
+                    endereco.getLatitude(),
+                    endereco.getLongitude()
             );
         }
         return new EstacionamentoOutDto(
@@ -45,6 +51,7 @@ public class EstacionamentoMapper {
                 e.getNome(),
                 endereco != null ? endereco.getId() : null,
                 enderecoResumo,
+                totalVagas,
                 e.getEsperaMinutos(),
                 e.getToleranciaMinutos()
         );

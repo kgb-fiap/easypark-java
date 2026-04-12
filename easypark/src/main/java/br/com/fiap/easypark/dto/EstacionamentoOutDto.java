@@ -5,6 +5,7 @@ public record EstacionamentoOutDto(
         String nome,
         Long enderecoId,
         EnderecoResumoOutDto endereco,
+        Long totalVagas,
         Integer esperaMinutos,
         Integer toleranciaMinutos
 ) {}
