@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | EasyPark</title>
+    <link rel="stylesheet" th:href="@{/web/css/easypark.css}">
+</head>
+<body class="auth-page">
+<main class="auth-shell">
+    <section class="auth-copy">
+        <img src="https://images.unsplash.com/photo-1506521781263-d8422e82f27a?auto=format&fit=crop&w=900&q=80"
+             alt="Estacionamento urbano com vagas demarcadas">
+        <div>
+            <p class="eyebrow">Sprint 3 Java</p>
+            <h1>EasyPark</h1>
+            <p>Acesso web academico para consulta de vagas e operacao assistida.</p>
+        </div>
+    </section>
+
+    <section class="auth-panel" aria-label="Formulario de login">
+        <h2>Entrar</h2>
+        <p th:if="${loginError}" class="alert error">E-mail ou senha invalidos.</p>
+        <p th:if="${logoutSuccess}" class="alert success">Sessao encerrada.</p>
+        <form th:action="@{/web/login}" method="post">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+            <label for="username">E-mail</label>
+            <input id="username" name="username" type="email" autocomplete="username" required autofocus>
+
+            <label for="password">Senha</label>
+            <input id="password" name="password" type="password" autocomplete="current-password" required>
+
+            <button type="submit">Acessar</button>
+        </form>
+        <div class="credentials">
+            <p><strong>Motorista:</strong> easypark.motorista@fiap.com.br / motorista123</p>
+            <p><strong>Operador:</strong> easypark.operador@fiap.com.br / operador123</p>
+            <p><strong>Admin:</strong> easypark.admin@fiap.com.br / admin123</p>
+        </div>
+    </section>
+</main>
+</body>
+</html>

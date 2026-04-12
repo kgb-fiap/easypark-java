@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vagas | EasyPark</title>
+    <link rel="stylesheet" th:href="@{/web/css/easypark.css}">
+</head>
+<body>
+<div th:replace="~{web/fragments :: header('vagas')}"></div>
+<main class="page">
+    <section>
+        <p class="eyebrow">Consulta</p>
+        <h1>Vagas</h1>
+        <form th:action="@{/web/vagas}" method="get" class="filter-form">
+            <label for="status">Status</label>
+            <select id="status" name="status">
+                <option value="">Todos</option>
+                <option th:each="option : ${statusOptions}"
+                        th:value="${option}"
+                        th:text="${option}"
+                        th:selected="${selectedStatus == option}">LIVRE</option>
+            </select>
+
+            <label for="estacionamentoId">Estacionamento</label>
+            <select id="estacionamentoId" name="estacionamentoId">
+                <option value="">Todos</option>
+                <option th:each="est : ${estacionamentos}"
+                        th:value="${est.id()}"
+                        th:text="${est.nome()}"
+                        th:selected="${estacionamentoId == est.id()}">Estacionamento</option>
+            </select>
+
+            <label for="nivelId">Nivel</label>
+            <input id="nivelId" name="nivelId" type="number" min="1" th:value="${nivelId}">
+
+            <label for="tipoVagaId">Tipo</label>
+            <input id="tipoVagaId" name="tipoVagaId" type="number" min="1" th:value="${tipoVagaId}">
+
+            <button type="submit">Filtrar</button>
+            <a th:href="@{/web/vagas}" class="secondary-link">Limpar</a>
+        </form>
+    </section>
+
+    <section>
+        <h2 th:text="${page.totalElements()} + ' vaga(s) encontradas'">Vagas encontradas</h2>
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Codigo</th>
+                <th>Nivel</th>
+                <th>Tipo</th>
+                <th>Ativa</th>
+                <th>Detalhe</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="vaga : ${page.content()}">
+                <td th:text="${vaga.id()}">1</td>
+                <td th:text="${vaga.codigo()}">A01</td>
+                <td th:text="${vaga.nivelId()}">1</td>
+                <td th:text="${vaga.tipoVagaId()}">1</td>
+                <td th:text="${vaga.ativa()} ? 'Sim' : 'Nao'">Sim</td>
+                <td><a th:href="@{/web/vagas/{id}(id=${vaga.id()})}">Abrir</a></td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(page.content())}">
+                <td colspan="6">Nenhuma vaga encontrada com os filtros informados.</td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</main>
+<div th:replace="~{web/fragments :: footer}"></div>
+</body>
+</html>

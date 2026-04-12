@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhe da vaga | EasyPark</title>
+    <link rel="stylesheet" th:href="@{/web/css/easypark.css}">
+</head>
+<body>
+<div th:replace="~{web/fragments :: header('vagas')}"></div>
+<main class="page">
+    <section>
+        <a th:href="@{/web/vagas}" class="secondary-link">Voltar para vagas</a>
+        <p class="eyebrow">Detalhe</p>
+        <h1 th:text="'Vaga ' + ${vaga.codigo()}">Vaga</h1>
+        <div th:if="${erro}" class="alert error" th:text="${erro}">Erro</div>
+        <div th:if="${sucesso}" class="alert success" th:text="${sucesso}">Sucesso</div>
+    </section>
+
+    <section class="detail-grid">
+        <div>
+            <h2>Cadastro</h2>
+            <dl>
+                <dt>ID</dt>
+                <dd th:text="${vaga.id()}">1</dd>
+                <dt>Codigo</dt>
+                <dd th:text="${vaga.codigo()}">A01</dd>
+                <dt>Nivel</dt>
+                <dd th:text="${vaga.nivelId()}">1</dd>
+                <dt>Tipo</dt>
+                <dd th:text="${vaga.tipoVagaId()}">1</dd>
+                <dt>Ativa</dt>
+                <dd th:text="${vaga.ativa()} ? 'Sim' : 'Nao'">Sim</dd>
+            </dl>
+        </div>
+
+        <div>
+            <h2>Status atual</h2>
+            <dl>
+                <dt>Status</dt>
+                <dd th:text="${status.status()}">DESCONHECIDO</dd>
+                <dt>Ultimo ocorrido</dt>
+                <dd th:text="${status.ultimoOcorrido() == null ? 'Sem registro' : status.ultimoOcorrido()}">Sem registro</dd>
+                <dt>Sensor</dt>
+                <dd th:text="${status.sensorId() == null ? 'Sem sensor' : status.sensorId()}">Sem sensor</dd>
+            </dl>
+        </div>
+    </section>
+
+    <section>
+        <p class="eyebrow">Motorista</p>
+        <h2>Criar pre-reserva</h2>
+        <form th:action="@{/web/vagas/{id}/pre-reservas(id=${vaga.id()})}"
+              th:object="${preReservaForm}"
+              method="post"
+              class="action-form">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+
+            <div>
+                <label for="inicioPrevisto">Inicio previsto</label>
+                <input id="inicioPrevisto" type="datetime-local" th:field="*{inicioPrevisto}" required>
+                <span class="field-error" th:if="${#fields.hasErrors('inicioPrevisto')}" th:errors="*{inicioPrevisto}">Erro</span>
+            </div>
+
+            <div>
+                <label for="duracaoMinutos">Duracao em minutos</label>
+                <input id="duracaoMinutos" type="number" min="15" max="720" th:field="*{duracaoMinutos}" required>
+                <span class="field-error" th:if="${#fields.hasErrors('duracaoMinutos')}" th:errors="*{duracaoMinutos}">Erro</span>
+            </div>
+
+            <div>
+                <label for="antecedenciaMinutos">Antecedencia em minutos</label>
+                <input id="antecedenciaMinutos" type="number" min="0" max="240" th:field="*{antecedenciaMinutos}" required>
+                <span class="field-error" th:if="${#fields.hasErrors('antecedenciaMinutos')}" th:errors="*{antecedenciaMinutos}">Erro</span>
+            </div>
+
+            <button type="submit">Criar pre-reserva</button>
+        </form>
+    </section>
+</main>
+<div th:replace="~{web/fragments :: footer}"></div>
+</body>
+</html>

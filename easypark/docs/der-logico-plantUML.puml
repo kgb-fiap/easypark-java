@@ -1,0 +1,229 @@
+@startuml
+' DER (lógico) – Notação Barker / Crow's Foot com atributos
+left to right direction
+skinparam shadowing false
+skinparam linetype ortho
+skinparam dpi 150
+
+entity "OPERADORA" as OPERADORA {
+  * id : NUMBER <<PK>>
+  cnpj : VARCHAR2(14)
+  razao_social : VARCHAR2(250)
+  nome_fantasia : VARCHAR2(250)
+  telefone : VARCHAR2(30)
+  criado_em : TIMESTAMP WITH TIME ZONE
+}
+
+entity "ESTACIONAMENTO" as ESTAC {
+  * id : NUMBER <<PK>>
+  operadora_id : NUMBER <<FK>>
+  nome : VARCHAR2(250)
+  endereco_id : NUMBER <<FK>>
+  espera_minutos : NUMBER
+  tolerancia_minutos : NUMBER
+  limite_no_show : NUMBER
+  max_antecedencia_minutos : NUMBER
+  max_antecedencia_minutos_suspenso : NUMBER
+  criado_em : TIMESTAMP WITH TIME ZONE
+}
+
+entity "NIVEL" as NIVEL {
+  * id : NUMBER <<PK>>
+  estacionamento_id : NUMBER <<FK>>
+  nome : VARCHAR2(150)
+  ordem : NUMBER
+  criado_em : TIMESTAMP WITH TIME ZONE
+}
+
+entity "TIPO_VAGA" as TIPO {
+  * id : NUMBER <<PK>>
+  nome : VARCHAR2(50)
+  eh_eletrica : CHAR(1)
+  eh_acessivel : CHAR(1)
+  eh_moto : CHAR(1)
+  tarifa_por_minuto : NUMBER(12,4)
+}
+
+entity "VAGA" as VAGA {
+  * id : NUMBER <<PK>>
+  nivel_id : NUMBER <<FK>>
+  codigo : VARCHAR2(50)
+  tipo_vaga_id : NUMBER <<FK>>
+  ativa : CHAR(1)
+  criado_em : TIMESTAMP WITH TIME ZONE
+}
+
+entity "SENSOR" as SENSOR {
+  * id : NUMBER <<PK>>
+  vaga_id : NUMBER <<FK>>
+  modelo : VARCHAR2(100)
+  identificador_externo : VARCHAR2(200)
+  ativo : CHAR(1)
+  config : VARCHAR2(4000)
+  criado_em : TIMESTAMP WITH TIME ZONE
+}
+
+entity "SENSOR_EVENTO" as SEVT {
+  * id : NUMBER <<PK>>
+  sensor_id : NUMBER <<FK>>
+  vaga_id : NUMBER <<FK>>
+  ocorrido_em : TIMESTAMP WITH TIME ZONE
+  recebido_em : TIMESTAMP WITH TIME ZONE
+  status : VARCHAR2(30)
+  payload : VARCHAR2(4000)
+}
+
+entity "VAGA_STATUS" as VSTATUS {
+  * vaga_id : NUMBER <<PK, FK>>
+  status_ocupacao : VARCHAR2(30)
+  ultimo_ocorrido : TIMESTAMP WITH TIME ZONE
+  sensor_id : NUMBER <<FK>>
+}
+
+entity "USUARIO" as USUARIO {
+  * id : NUMBER <<PK>>
+  nome : VARCHAR2(250)
+  email : VARCHAR2(320)
+  senha_hash : VARCHAR2(255)
+  telefone : VARCHAR2(30)
+  perfil : VARCHAR2(20)
+  suspenso : CHAR(1)
+  no_shows : NUMBER
+  suspensao_ate : TIMESTAMP WITH TIME ZONE
+  criado_em : TIMESTAMP WITH TIME ZONE
+}
+
+entity "RESERVA" as RESERVA {
+  * id : NUMBER <<PK>>
+  usuario_id : NUMBER <<FK>>
+  vaga_id : NUMBER <<FK>>
+  estado : VARCHAR2(20)
+  criado_em : TIMESTAMP WITH TIME ZONE
+  inicio_previsto : TIMESTAMP WITH TIME ZONE
+  duracao_minutos : NUMBER
+  antecedencia_minutos : NUMBER
+  confirmado_em : TIMESTAMP WITH TIME ZONE
+  ocupado_em : TIMESTAMP WITH TIME ZONE
+  pago_em : TIMESTAMP WITH TIME ZONE
+  motivo_cancelamento : VARCHAR2(4000)
+  vaga_bloqueada : CHAR(1)
+  eta_origem : VARCHAR2(100)
+  eta_minutos : NUMBER
+  eta_atualizado_em : TIMESTAMP WITH TIME ZONE
+}
+
+entity "RESERVA_PRECO" as RPRECO {
+  * reserva_id : NUMBER <<PK, FK>>
+  tarifa_por_minuto : NUMBER(12,4)
+  percentual_antecedencia : NUMBER(8,6)
+  antecedencia_minutos_aplicada : NUMBER
+  observacao : VARCHAR2(200)
+  valor_previsto : NUMBER(12,4)
+  valor_final : NUMBER(12,4)
+  moeda : VARCHAR2(3)
+  calculado_em : TIMESTAMP WITH TIME ZONE
+}
+
+entity "RESERVA_HIST" as RHIST {
+  * id : NUMBER <<PK>>
+  reserva_id : NUMBER <<FK>>
+  from_estado : VARCHAR2(20)
+  to_estado : VARCHAR2(20)
+  origem_evento : VARCHAR2(20)
+  referencia_id : NUMBER
+  observacao : VARCHAR2(200)
+  ocorrido_em : TIMESTAMP WITH TIME ZONE
+}
+
+entity "PAGAMENTO" as PAGTO {
+  * id : NUMBER <<PK>>
+  reserva_id : NUMBER <<FK>>
+  usuario_id : NUMBER <<FK>>
+  valor : NUMBER(12,4)
+  status : VARCHAR2(30)
+  criado_em : TIMESTAMP WITH TIME ZONE
+  metodo_pagamento : VARCHAR2(20)
+  idempotencia_chave : VARCHAR2(64)
+  gateway_provider : VARCHAR2(100)
+  gateway_tx_id : VARCHAR2(200)
+  gateway_response : VARCHAR2(4000)
+}
+
+entity "PAGAMENTO_PAGADOR" as PPAG {
+  * pagamento_id : NUMBER <<PK, FK>>
+  nome : VARCHAR2(150)
+  cpf_cnpj : VARCHAR2(14)
+  email : VARCHAR2(320)
+  telefone : VARCHAR2(30)
+  endereco_id : NUMBER <<FK>>
+}
+
+entity "PAGAMENTO_CARTAO" as PCART {
+  * pagamento_id : NUMBER <<PK, FK>>
+  token : VARCHAR2(200)
+  bandeira : VARCHAR2(20)
+  final_cartao : VARCHAR2(4)
+  titular_nome : VARCHAR2(150)
+}
+
+' --- NOVO: domínio de endereço em 3FN ---
+entity "UF" as UF {
+  * sigla : VARCHAR2(2) <<PK>>
+  nome    : VARCHAR2(50)
+}
+
+entity "CIDADE" as CIDADE {
+  * id      : NUMBER <<PK>>
+  nome      : VARCHAR2(80)
+  uf_sigla  : VARCHAR2(2) <<FK>>
+}
+
+entity "BAIRRO" as BAIRRO {
+  * id        : NUMBER <<PK>>
+  nome        : VARCHAR2(80)
+  cidade_id   : NUMBER <<FK>>
+}
+
+entity "ENDERECO" as END {
+  * id          : NUMBER <<PK>>
+  cep           : VARCHAR2(10)
+  logradouro    : VARCHAR2(150)
+  numero        : VARCHAR2(20)
+  complemento   : VARCHAR2(50)
+  bairro_id     : NUMBER <<FK>>
+  latitude      : NUMBER(9,6)
+  longitude     : NUMBER(9,6)
+}
+
+' Relacionamentos (Barker)
+OPERADORA      ||--o{ ESTAC     : "1..N"
+ESTAC          ||--o{ NIVEL     : "1..N"
+NIVEL          ||--o{ VAGA      : "1..N"
+TIPO           ||--o{ VAGA      : "1..N"
+VAGA           ||--o{ SENSOR    : "1..N"
+SENSOR         ||--o{ SEVT      : "1..N"
+VAGA           ||--|| VSTATUS   : "1..1 (cache)"
+USUARIO        ||--o{ RESERVA   : "1..N"
+VAGA           ||--o{ RESERVA   : "1..N (0..1 ativa por regra)"
+RESERVA        ||--|| RPRECO    : "1..1"
+RESERVA        ||--o{ RHIST     : "1..N"
+RESERVA        ||--o{ PAGTO     : "1..N"
+PAGTO          ||--|| PPAG      : "0..1"
+PAGTO          ||--|| PCART     : "0..1"
+
+' Endereços
+UF             ||--o{ CIDADE
+CIDADE         ||--o{ BAIRRO
+BAIRRO         ||--o{ END
+ESTAC          ||--|| END       : "endereco_id"
+PPAG           |o--|| END       : "endereco_id (0..1)"
+
+legend right
+  Notação Barker (crow’s foot):
+  || = 1 obrigatório, |o = 0..1, }| = 1..N, }o = 0..N.
+  Observações:
+  - UF usa chave natural 'sigla' como PK.
+  - ENDERECO está normalizado (UF→Cidade→Bairro→Endereco).
+  - VAGA_STATUS é cache 1:1 da VAGA.
+endlegend
+@enduml

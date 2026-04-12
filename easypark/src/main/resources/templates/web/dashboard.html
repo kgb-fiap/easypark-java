@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio | EasyPark</title>
+    <link rel="stylesheet" th:href="@{/web/css/easypark.css}">
+</head>
+<body>
+<div th:replace="~{web/fragments :: header('dashboard')}"></div>
+<main class="page">
+    <section class="hero">
+        <div>
+            <p class="eyebrow">Painel web</p>
+            <h1 th:text="'Bem-vindo, ' + ${username}">Bem-vindo</h1>
+            <p>Consulte vagas e acompanhe status usando os dados atuais do banco Oracle.</p>
+        </div>
+        <img src="https://images.unsplash.com/photo-1573348722427-f1d6819fdf98?auto=format&fit=crop&w=900&q=80"
+             alt="Garagem de estacionamento iluminada">
+    </section>
+
+    <section class="summary-grid" aria-label="Acoes principais">
+        <a th:href="@{/web/vagas}" class="action-tile">
+            <strong>Consultar vagas</strong>
+            <span>Filtros por status, estacionamento, nivel e tipo.</span>
+        </a>
+        <a th:href="@{/web/minhas-reservas}" class="action-tile">
+            <strong>Minhas reservas</strong>
+            <span>Acompanhe pre-reservas e atualize o ETA.</span>
+        </a>
+        <a sec:authorize="hasAnyRole('OPERADOR','ADMIN')" th:href="@{/web/operador}" class="action-tile">
+            <strong>Painel operacional</strong>
+            <span>Eventos de sensor e timeouts operacionais.</span>
+        </a>
+    </section>
+
+    <section>
+        <h2>Estacionamentos recentes</h2>
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>Espera</th>
+                <th>Tolerancia</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="est : ${estacionamentos}">
+                <td th:text="${est.id()}">1</td>
+                <td th:text="${est.nome()}">Estacionamento</td>
+                <td th:text="${est.esperaMinutos()}">10</td>
+                <td th:text="${est.toleranciaMinutos()}">5</td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(estacionamentos)}">
+                <td colspan="4">Nenhum estacionamento encontrado.</td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section>
+        <h2>Vagas recentes</h2>
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Codigo</th>
+                <th>Nivel</th>
+                <th>Tipo</th>
+                <th>Ativa</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="vaga : ${vagas}">
+                <td><a th:href="@{/web/vagas/{id}(id=${vaga.id()})}" th:text="${vaga.id()}">1</a></td>
+                <td th:text="${vaga.codigo()}">A01</td>
+                <td th:text="${vaga.nivelId()}">1</td>
+                <td th:text="${vaga.tipoVagaId()}">1</td>
+                <td th:text="${vaga.ativa()} ? 'Sim' : 'Nao'">Sim</td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(vagas)}">
+                <td colspan="5">Nenhuma vaga encontrada.</td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</main>
+<div th:replace="~{web/fragments :: footer}"></div>
+</body>
+</html>

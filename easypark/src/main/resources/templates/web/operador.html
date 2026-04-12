@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operador | EasyPark</title>
+    <link rel="stylesheet" th:href="@{/web/css/easypark.css}">
+</head>
+<body>
+<div th:replace="~{web/fragments :: header('operador')}"></div>
+<main class="page">
+    <section>
+        <p class="eyebrow">Area protegida</p>
+        <h1>Painel operacional</h1>
+        <p>Registre eventos de sensor, acompanhe reservas e execute timeouts operacionais.</p>
+        <div th:if="${sensorEventoId}" class="alert success" th:text="'Evento de sensor registrado: #' + ${sensorEventoId}">Evento</div>
+        <div th:if="${reservasCanceladas != null}" class="alert success" th:text="'Reservas canceladas: ' + ${reservasCanceladas}">Reservas</div>
+        <div th:if="${preReservasCanceladas != null}" class="alert success" th:text="'Pre-reservas canceladas: ' + ${preReservasCanceladas}">Pre-reservas</div>
+        <div th:if="${erro}" class="alert error" th:text="${erro}">Erro</div>
+    </section>
+
+    <section class="detail-grid">
+        <div>
+            <h2>Evento de sensor</h2>
+            <form th:action="@{/web/operador/sensor-eventos}" th:object="${sensorEventoForm}" method="post" class="action-form">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+
+                <label for="sensorId">Sensor ID</label>
+                <input id="sensorId" type="number" min="1" th:field="*{sensorId}" required>
+
+                <label for="vagaId">Vaga ID</label>
+                <input id="vagaId" type="number" min="1" th:field="*{vagaId}" required>
+
+                <label for="status">Status</label>
+                <select id="status" th:field="*{status}">
+                    <option value="OCUPADA">OCUPADA</option>
+                    <option value="LIVRE">LIVRE</option>
+                    <option value="DESCONHECIDO">DESCONHECIDO</option>
+                </select>
+
+                <label for="ocorridoEm">Ocorrido em</label>
+                <input id="ocorridoEm" type="datetime-local" th:field="*{ocorridoEm}">
+
+                <label for="payload">Payload</label>
+                <textarea id="payload" th:field="*{payload}" rows="4"></textarea>
+
+                <button type="submit">Registrar evento</button>
+            </form>
+        </div>
+
+        <div>
+            <h2>Timeouts</h2>
+            <form th:action="@{/web/operador/timeouts/pre-reservas}" method="post" class="stacked-actions">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                <button type="submit">Executar timeouts de pre-reserva</button>
+            </form>
+            <form th:action="@{/web/operador/timeouts/reservas}" method="post" class="stacked-actions">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                <button type="submit">Executar timeouts de reserva</button>
+            </form>
+        </div>
+    </section>
+
+    <section>
+        <h2>Sensores ativos</h2>
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Vaga</th>
+                <th>Codigo</th>
+                <th>Modelo</th>
+                <th>Identificador</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="sensor : ${sensores}">
+                <td th:text="${sensor.id()}">1</td>
+                <td th:text="${sensor.vagaId()}">1</td>
+                <td th:text="${sensor.vagaCodigo()}">A01</td>
+                <td th:text="${sensor.modelo()}">Modelo</td>
+                <td th:text="${sensor.identificadorExterno()}">EXT</td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(sensores)}">
+                <td colspan="5">Nenhum sensor ativo encontrado.</td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section>
+        <h2>Reservas recentes</h2>
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Usuario</th>
+                <th>Vaga</th>
+                <th>Estado</th>
+                <th>Inicio previsto</th>
+                <th>ETA</th>
+                <th>Bloqueada</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="reserva : ${reservas}">
+                <td th:text="${reserva.id()}">1</td>
+                <td th:text="${reserva.usuarioEmail()}">motorista@email.com</td>
+                <td th:text="${reserva.vagaCodigo()}">A01</td>
+                <td th:text="${reserva.estado()}">RESERVA</td>
+                <td th:text="${reserva.inicioPrevisto()}">2026-04-11 15:00</td>
+                <td th:text="${reserva.etaMinutos() == null ? 'Sem ETA' : reserva.etaMinutos() + ' min'}">10 min</td>
+                <td th:text="${reserva.vagaBloqueada()}">Sim</td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(reservas)}">
+                <td colspan="7">Nenhuma reserva recente encontrada.</td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section>
+        <h2>Eventos recentes</h2>
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Sensor</th>
+                <th>Vaga</th>
+                <th>Status</th>
+                <th>Ocorrido</th>
+                <th>Recebido</th>
+                <th>Payload</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="evento : ${eventos}">
+                <td th:text="${evento.id()}">1</td>
+                <td th:text="${evento.sensorId()}">1</td>
+                <td th:text="${evento.vagaId()}">1</td>
+                <td th:text="${evento.status()}">OCUPADA</td>
+                <td th:text="${evento.ocorridoEm()}">2026-04-11 15:00</td>
+                <td th:text="${evento.recebidoEm()}">2026-04-11 15:00</td>
+                <td th:text="${evento.payload()}">{}</td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(eventos)}">
+                <td colspan="7">Nenhum evento recente encontrado.</td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</main>
+<div th:replace="~{web/fragments :: footer}"></div>
+</body>
+</html>

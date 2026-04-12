@@ -236,6 +236,154 @@ spring.datasource.password=${DB_EASYPARK_PASS}
 
 ---
 
+## Sprint 3 - Java Avancado
+
+Esta sprint adiciona uma aplicacao web academica com Thymeleaf, Flyway para versionamento do banco Oracle, Spring Security para autenticacao e controle de acesso, e integracao backend com Firebase Authentication para o futuro frontend React.
+
+O frontend principal em React ainda nao consome os fluxos REST de negocio, mas o backend ja aceita a validacao de ID tokens do Firebase quando `firebase.enabled=true`. Nesta entrega, a API REST atual permanece publica para preservar compatibilidade, mas pode receber `Authorization: Bearer <idToken>` e popular o usuario autenticado no Spring Security.
+
+### Stack adicionada
+
+- Spring Security
+- Thymeleaf
+- Thymeleaf Extras Spring Security
+- Flyway
+- Flyway Oracle
+- Firebase Admin SDK
+
+### URLs web
+
+- Login web: `http://localhost:8080/web/login`
+- Dashboard web: `http://localhost:8080/web`
+- Consulta de vagas: `http://localhost:8080/web/vagas`
+- Minhas reservas: `http://localhost:8080/web/minhas-reservas`
+- Painel operador: `http://localhost:8080/web/operador`
+- Status Firebase: `http://localhost:8080/auth/firebase/status`
+- Usuario Firebase autenticado: `http://localhost:8080/auth/firebase/me`
+
+### Usuarios academicos
+
+Os usuarios abaixo sao criados pela migration `V4__seed_sprint_3_security_users.sql` com senha BCrypt.
+
+| Perfil | E-mail | Senha | Permissoes |
+|---|---|---|---|
+| Motorista | `easypark.motorista@fiap.com.br` | `motorista123` | Acessa `/web`, `/web/vagas` e `/web/minhas-reservas` |
+| Operador | `easypark.operador@fiap.com.br` | `operador123` | Acessa rotas de motorista e `/web/operador` |
+| Admin | `easypark.admin@fiap.com.br` | `admin123` | Acessa rotas de motorista e `/web/operador` |
+
+Mapeamento de roles:
+
+- `cliente` -> `ROLE_MOTORISTA`
+- `operador` -> `ROLE_MOTORISTA`, `ROLE_OPERADOR`
+- `admin` -> `ROLE_MOTORISTA`, `ROLE_OPERADOR`, `ROLE_ADMIN`
+
+Usuarios com `suspenso = 'Y'` ou `suspensao_ate` futura ficam bloqueados para login.
+
+### Flyway
+
+As migrations ficam em `easypark/src/main/resources/db/migration`:
+
+- `V1__create_easypark_schema_sprint_1.sql`: schema base do EasyPark.
+- `V2__create_reserva_triggers_and_jobs.sql`: trigger de sensor, ETA e timeouts.
+- `V3__apply_sprint_2_database_evolution.sql`: evolucao entregue na Sprint 2.
+- `V4__seed_sprint_3_security_users.sql`: usuarios academicos da Sprint 3.
+
+O Flyway esta configurado com `baseline-on-migrate=true` e `baseline-version=3`. Isso permite conectar em um schema Oracle existente da Sprint 2, ja populado, sem apagar dados. Em schema limpo, as migrations V1 a V4 podem ser aplicadas em sequencia.
+
+Os scripts historicos entregues na Sprint 2 foram preservados em `easypark/docs/sql`. Eles servem como referencia documental e nao substituem as migrations versionadas.
+
+### Spring Security e Firebase
+
+A seguranca foi separada por escopo:
+
+- `/web/**`: autenticado com formulario Spring Security.
+- `/web/operador/**`: exige `ROLE_OPERADOR` ou `ROLE_ADMIN`.
+- `/auth/firebase/status`: publico, usado para conferir se a integracao Firebase esta habilitada e inicializada.
+- `/auth/firebase/me`: exige `Authorization: Bearer <idToken>` valido quando Firebase estiver habilitado.
+- Demais endpoints REST: permanecem publicos nesta sprint, mas aceitam o filtro opcional de Firebase quando o token for enviado.
+
+Firebase e Spring Security coexistem nesta implementacao. O React deve autenticar o usuario no Firebase Client SDK e enviar o ID token nas chamadas ao backend:
+
+```javascript
+const token = await firebase.auth().currentUser.getIdToken();
+await fetch("http://localhost:8080/auth/firebase/me", {
+  headers: { Authorization: `Bearer ${token}` }
+});
+```
+
+Configuracao do backend:
+
+```powershell
+$env:FIREBASE_ENABLED="true"
+$env:FIREBASE_PROJECT_ID="seu-project-id"
+$env:FIREBASE_CREDENTIALS_PATH="C:\caminho\service-account.json"
+$env:FIREBASE_ALLOWED_ORIGINS="http://localhost:5173,http://localhost:3000"
+$env:FIREBASE_DEFAULT_ROLE="MOTORISTA"
+```
+
+Se `FIREBASE_CREDENTIALS_PATH` nao for informado, a aplicacao tenta usar Application Default Credentials do Google. O arquivo JSON da service account nao deve ser commitado.
+
+Mapeamento de claims Firebase:
+
+- claim `roles`, `role` ou `perfil` com `admin` -> `ROLE_MOTORISTA`, `ROLE_OPERADOR`, `ROLE_ADMIN`;
+- claim `roles`, `role` ou `perfil` com `operador` -> `ROLE_MOTORISTA`, `ROLE_OPERADOR`;
+- claim `roles`, `role` ou `perfil` com `cliente` ou `motorista` -> `ROLE_MOTORISTA`;
+- sem claim de perfil -> `FIREBASE_DEFAULT_ROLE`, por padrao `MOTORISTA`.
+
+### Fluxos implementados
+
+Fluxo motorista:
+
+- consultar vagas em `/web/vagas`;
+- abrir detalhe de uma vaga;
+- criar `PRE_RESERVA` usando a procedure `reserva_ins`;
+- acompanhar reservas em `/web/minhas-reservas`;
+- atualizar ETA usando `user_eta_update_process`, permitindo a transicao `PRE_RESERVA -> RESERVA` quando a regra de antecedencia for atendida.
+
+Fluxo operador:
+
+- consultar reservas recentes em `/web/operador`;
+- consultar sensores ativos;
+- registrar evento de sensor usando `sensor_evento_ins`;
+- atualizar status da vaga por trigger `trg_sensor_evento_after_insert`;
+- executar timeouts com `reserva_prereserva_timeouts` e `reserva_timeouts`.
+
+Pagamento real ficou fora do escopo da Sprint 3.
+
+### Validacoes
+
+- pre-reserva: inicio previsto presente e futuro/presente, duracao entre 15 e 720 minutos, antecedencia entre 0 e 240 minutos;
+- ETA: valor entre 0 e 240 minutos;
+- evento de sensor: IDs positivos, status `LIVRE`, `OCUPADA` ou `DESCONHECIDO`, payload com ate 4000 caracteres.
+
+### Roteiro de demonstracao
+
+1. Executar `.\mvnw.cmd clean test` dentro de `easypark`.
+2. Executar `.\mvnw.cmd spring-boot:run` dentro de `easypark`.
+3. Acessar `/web/login` com o usuario motorista.
+4. Consultar uma vaga em `/web/vagas`.
+5. Criar uma pre-reserva para uma vaga livre.
+6. Acessar `/web/minhas-reservas` e atualizar o ETA.
+7. Entrar com usuario operador.
+8. Acessar `/web/operador`, registrar evento de sensor e consultar o status atualizado.
+9. Executar timeouts apenas em cenario preparado, pois eles alteram dados reais do Oracle.
+10. Abrir `/swagger-ui.html` para conferir que a API REST continua disponivel.
+
+### Limitacoes conhecidas
+
+- A validacao automatica evitou criar pre-reservas validas, registrar eventos reais de sensor e executar timeouts para nao alterar dados ja carregados no Oracle da Sprint 2.
+- O React segue como frontend principal futuro; nesta sprint o backend ja valida tokens Firebase, mas os fluxos REST de negocio ainda nao foram adaptados para exigir autenticacao Firebase obrigatoria.
+- A camada web Thymeleaf e academica e existe para atender aos requisitos da Sprint 3 Java.
+
+### Documentacao da Sprint 3
+
+- Evolucao da Sprint 3: `easypark/docs/sprint-3-evolucao.md`
+- DER PlantUML: `easypark/docs/der-logico-plantUML.puml`
+- Scripts SQL historicos: `easypark/docs/sql`
+- Colecao Postman: `easypark/docs/postman`
+
+---
+
 ## Roadmap (Sprints 3 e 4)
 - **Autenticação/JWT** (usuários finais e operadores) e no-show por usuário.  
 - **Pagamento online integrado** (gateway BR: tokenização, idempotência).  

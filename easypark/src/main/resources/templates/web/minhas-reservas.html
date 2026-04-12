@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minhas reservas | EasyPark</title>
+    <link rel="stylesheet" th:href="@{/web/css/easypark.css}">
+</head>
+<body>
+<div th:replace="~{web/fragments :: header('reservas')}"></div>
+<main class="page">
+    <section>
+        <p class="eyebrow">Motorista</p>
+        <h1>Minhas reservas</h1>
+        <div th:if="${created}" class="alert success" th:text="'Pre-reserva criada: #' + ${created}">Criada</div>
+        <div th:if="${etaStatus}" class="alert success" th:text="'ETA: ' + ${etaStatus} + ' - ' + ${etaMsg}">ETA</div>
+        <div th:if="${erro}" class="alert error" th:text="${erro}">Erro</div>
+    </section>
+
+    <section>
+        <h2>Historico recente</h2>
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Vaga</th>
+                <th>Estado</th>
+                <th>Inicio previsto</th>
+                <th>Duracao</th>
+                <th>Antecedencia</th>
+                <th>ETA atual</th>
+                <th>Bloqueada</th>
+                <th>Atualizar ETA</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="reserva : ${reservas}">
+                <td th:text="${reserva.id()}">1</td>
+                <td>
+                    <a th:href="@{/web/vagas/{id}(id=${reserva.vagaId()})}" th:text="${reserva.vagaCodigo()}">A01</a>
+                </td>
+                <td th:text="${reserva.estado()}">PRE_RESERVA</td>
+                <td th:text="${reserva.inicioPrevisto()}">2026-04-11 15:00</td>
+                <td th:text="${reserva.duracaoMinutos()} + ' min'">60 min</td>
+                <td th:text="${reserva.antecedenciaMinutos()} + ' min'">15 min</td>
+                <td th:text="${reserva.etaMinutos() == null ? 'Sem ETA' : reserva.etaMinutos() + ' min'}">10 min</td>
+                <td th:text="${reserva.vagaBloqueada()}">Nao</td>
+                <td>
+                    <form th:action="@{/web/minhas-reservas/{id}/eta(id=${reserva.id()})}" method="post" class="inline-form">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                        <input name="minutos" type="number" min="0" max="240" required
+                               th:value="${reserva.etaMinutos() == null ? 10 : reserva.etaMinutos()}">
+                        <button type="submit">Atualizar</button>
+                    </form>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(reservas)}">
+                <td colspan="9">Nenhuma reserva encontrada para o usuario autenticado.</td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</main>
+<div th:replace="~{web/fragments :: footer}"></div>
+</body>
+</html>
