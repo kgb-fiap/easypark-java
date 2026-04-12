@@ -5,6 +5,8 @@ import br.com.fiap.easypark.configs.FirebaseProperties;
 import br.com.fiap.easypark.dto.FirebaseAuthStatusOutDto;
 import br.com.fiap.easypark.dto.FirebaseUserOutDto;
 import com.google.firebase.auth.FirebaseAuth;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,6 +25,7 @@ public class FirebaseAuthController {
     }
 
     @GetMapping("/status")
+    @Operation(summary = "Consulta o status da integracao Firebase")
     public FirebaseAuthStatusOutDto status() {
         return new FirebaseAuthStatusOutDto(
                 firebaseProperties.enabled(),
@@ -32,6 +35,8 @@ public class FirebaseAuthController {
     }
 
     @GetMapping("/me")
+    @Operation(summary = "Consulta o usuario autenticado pelo Firebase")
+    @SecurityRequirement(name = "firebaseAuth")
     public FirebaseUserOutDto me(Authentication authentication) {
         var principal = (FirebasePrincipal) authentication.getPrincipal();
         var authorities = authentication.getAuthorities().stream()

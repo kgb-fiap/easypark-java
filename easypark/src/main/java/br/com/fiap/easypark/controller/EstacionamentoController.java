@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springdoc.core.annotations.ParameterObject;
 
 import java.util.List;
 
@@ -32,7 +33,7 @@ public class EstacionamentoController {
 
     @GetMapping
     public ResponseEntity<PageResponse<EstacionamentoOutDto>> list(
-            @PageableDefault(size = 20, sort = "nome") Pageable pageable
+            @ParameterObject @PageableDefault(size = 20, sort = "nome") Pageable pageable
     ) {
         return ResponseEntity.ok(service.findAll(pageable));
     }
