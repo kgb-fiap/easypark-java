@@ -28,6 +28,7 @@ a {
 }
 
 button,
+.button-link,
 .action-tile,
 input,
 select,
@@ -45,6 +46,20 @@ button {
 }
 
 button:hover {
+    background: var(--accent-strong);
+}
+
+.button-link {
+    background: var(--accent);
+    color: #ffffff;
+    display: inline-block;
+    font-weight: 700;
+    padding: 0.75rem 1rem;
+    text-align: center;
+    text-decoration: none;
+}
+
+.button-link:hover {
     background: var(--accent-strong);
 }
 
@@ -96,6 +111,12 @@ img {
 .action-form {
     display: grid;
     gap: 0.75rem;
+}
+
+.form-grid {
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
 }
 
 .auth-panel input,
@@ -273,6 +294,29 @@ section {
 
 .action-tile span {
     color: var(--muted);
+}
+
+.result-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.result-card {
+    border: 1px solid var(--line);
+    display: grid;
+    gap: 1rem;
+    padding: 1rem;
+}
+
+.muted,
+small {
+    color: var(--muted);
+}
+
+td small {
+    display: block;
+    margin-top: 0.2rem;
 }
 
 table {
