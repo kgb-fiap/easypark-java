@@ -22,7 +22,7 @@ public class ReservaCreateForm {
 
     @NotNull(message = "Informe a duracao.")
     @Min(value = 15, message = "A duracao minima e de 15 minutos.")
-    @Max(value = 720, message = "A duracao maxima e de 720 minutos.")
+    @Max(value = 1440, message = "A duracao maxima e de 1440 minutos.")
     private Integer duracaoMinutos = 60;
 
     @NotNull(message = "Informe a antecedencia.")

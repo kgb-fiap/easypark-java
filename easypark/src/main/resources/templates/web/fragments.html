@@ -5,7 +5,7 @@
     <a class="brand" th:href="@{/web}">EasyPark</a>
     <nav aria-label="Navegacao principal">
         <a th:href="@{/web}" th:classappend="${active == 'dashboard'} ? ' active' : ''">Inicio</a>
-        <a th:href="@{/web/vagas}" th:classappend="${active == 'vagas'} ? ' active' : ''">Vagas</a>
+        <a th:href="@{/web/estacionamentos}" th:classappend="${active == 'estacionamentos'} ? ' active' : ''">Estacionamentos</a>
         <a th:href="@{/web/minhas-reservas}" th:classappend="${active == 'reservas'} ? ' active' : ''">Reservas</a>
         <a sec:authorize="hasAnyRole('OPERADOR','ADMIN')" th:href="@{/web/operador}" th:classappend="${active == 'operador'} ? ' active' : ''">Operador</a>
     </nav>
@@ -17,8 +17,7 @@
 </header>
 
 <footer th:fragment="footer" class="footer">
-    <span>EasyPark Sprint 3 Java</span>
-    <span>React e Firebase ficam para a integracao futura.</span>
+    <span>EasyPark Java</span>
 </footer>
 </body>
 </html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estacionamentos | EasyPark</title>
+    <link rel="stylesheet" th:href="@{/web/css/easypark.css}">
+</head>
+<body>
+<div th:replace="~{web/fragments :: header('estacionamentos')}"></div>
+<main class="page">
+    <section>
+        <p class="eyebrow">Destino</p>
+        <h1>Estacionamentos proximos</h1>
+        <form th:action="@{/web/estacionamentos}" method="get" class="filter-form">
+            <label for="destino">Destino</label>
+            <input id="destino" name="destino" type="search" th:value="${destino}"
+                   placeholder="Ex.: Paulista, Centro, 01310-100">
+
+            <label for="lat">Latitude</label>
+            <input id="lat" name="lat" type="number" step="0.000001" th:value="${lat}">
+
+            <label for="lng">Longitude</label>
+            <input id="lng" name="lng" type="number" step="0.000001" th:value="${lng}">
+
+            <button type="submit">Buscar</button>
+            <a th:href="@{/web/estacionamentos}" class="secondary-link">Limpar</a>
+        </form>
+        <p class="muted" th:if="${resultado.referenciaPorEnderecoCadastrado()}">
+            Usando coordenadas de um endereco cadastrado parecido com o destino.
+        </p>
+        <p class="muted" th:if="${resultado.latitudeReferencia() == null}">
+            Distancia exibida apenas quando o destino ou o estacionamento possui coordenadas suficientes.
+        </p>
+    </section>
+
+    <section>
+        <h2 th:text="${#lists.size(resultado.estacionamentos()) + ' estacionamento(s) encontrado(s)'}">Estacionamentos</h2>
+        <div class="result-grid">
+            <article class="result-card" th:each="est : ${resultado.estacionamentos()}">
+                <div>
+                    <p class="eyebrow" th:text="${est.distanciaTexto()}">1.2 km</p>
+                    <h3 th:text="${est.nome()}">EasyPark Centro</h3>
+                    <p th:text="${est.enderecoCompleto()}">Endereco</p>
+                    <p class="muted" th:text="${est.operadoraNome()}">Operadora</p>
+                </div>
+                <dl>
+                    <dt>Vagas livres</dt>
+                    <dd th:text="${est.vagasLivres() + ' de ' + est.totalVagas()}">4 de 20</dd>
+                    <dt>Espera</dt>
+                    <dd th:text="${est.esperaMinutos() + ' min'}">10 min</dd>
+                    <dt>Tolerancia</dt>
+                    <dd th:text="${est.toleranciaMinutos() + ' min'}">5 min</dd>
+                </dl>
+                <a class="button-link" th:href="@{/web/estacionamentos/{id}(id=${est.id()})}">Escolher estacionamento</a>
+            </article>
+        </div>
+        <p th:if="${#lists.isEmpty(resultado.estacionamentos())}">
+            Nenhum estacionamento encontrado para os filtros informados.
+        </p>
+    </section>
+</main>
+<div th:replace="~{web/fragments :: footer}"></div>
+</body>
+</html>

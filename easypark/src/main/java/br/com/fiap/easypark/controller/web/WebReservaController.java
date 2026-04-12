@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.math.BigDecimal;
 import java.security.Principal;
 
 @Controller
@@ -27,6 +28,7 @@ public class WebReservaController {
 
     @GetMapping
     public String list(@RequestParam(required = false) Long created,
+                       @RequestParam(required = false) BigDecimal valorPrevisto,
                        @RequestParam(required = false) String etaStatus,
                        @RequestParam(required = false) String etaMsg,
                        @RequestParam(required = false) String erro,
@@ -36,6 +38,7 @@ public class WebReservaController {
         model.addAttribute("reservas", reservaWebService.listarReservasDoUsuario(principal.getName()));
         model.addAttribute("etaForm", new EtaForm());
         model.addAttribute("created", created);
+        model.addAttribute("valorPrevisto", valorPrevisto);
         model.addAttribute("etaStatus", etaStatus);
         model.addAttribute("etaMsg", etaMsg);
         model.addAttribute("erro", erro);

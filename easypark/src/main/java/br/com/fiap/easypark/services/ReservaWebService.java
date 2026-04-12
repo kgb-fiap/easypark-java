@@ -1,6 +1,7 @@
 package br.com.fiap.easypark.services;
 
 import br.com.fiap.easypark.dto.EtaUpdateOutDto;
+import br.com.fiap.easypark.dto.web.PreReservaCreateResult;
 import br.com.fiap.easypark.dto.web.ReservaCreateForm;
 import br.com.fiap.easypark.dto.web.ReservaWebDto;
 import br.com.fiap.easypark.dto.web.SensorEventoForm;
@@ -12,6 +13,7 @@ import jakarta.persistence.ParameterMode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -24,19 +26,27 @@ public class ReservaWebService {
     private final EntityManager em;
     private final UsuarioRepository usuarioRepository;
     private final ReservaJobsService reservaJobsService;
+    private final ReservaValorService reservaValorService;
 
     public ReservaWebService(EntityManager em,
                              UsuarioRepository usuarioRepository,
-                             ReservaJobsService reservaJobsService) {
+                             ReservaJobsService reservaJobsService,
+                             ReservaValorService reservaValorService) {
         this.em = em;
         this.usuarioRepository = usuarioRepository;
         this.reservaJobsService = reservaJobsService;
+        this.reservaValorService = reservaValorService;
     }
 
     @Transactional
-    public Long criarPreReserva(String email, Long vagaId, ReservaCreateForm form) {
+    public PreReservaCreateResult criarPreReserva(String email, Long vagaId, ReservaCreateForm form) {
         var usuario = usuarioRepository.findByEmailIgnoreCase(email)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario autenticado nao encontrado."));
+        var valorPrevisto = reservaValorService.calcularPorVaga(
+                vagaId,
+                form.getDuracaoMinutos(),
+                form.getAntecedenciaMinutos()
+        );
 
         var sp = em.createStoredProcedureQuery("reserva_ins");
         sp.registerStoredProcedureParameter("p_usuario_id", Long.class, ParameterMode.IN);
@@ -52,7 +62,7 @@ public class ReservaWebService {
         sp.setParameter("p_antecedencia_minutos", form.getAntecedenciaMinutos());
         executeProcedure(sp);
 
-        return toLong(sp.getOutputParameterValue("p_id"));
+        return new PreReservaCreateResult(toLong(sp.getOutputParameterValue("p_id")), valorPrevisto);
     }
 
     @Transactional(readOnly = true)
@@ -63,6 +73,11 @@ public class ReservaWebService {
                        u.email,
                        r.vaga_id,
                        v.codigo,
+                       e.id,
+                       e.nome,
+                       n.nome,
+                       tv.nome,
+                       tv.tarifa_por_minuto,
                        r.estado,
                        TO_CHAR(r.criado_em, :dateFormat),
                        TO_CHAR(r.inicio_previsto, :dateFormat),
@@ -76,6 +91,9 @@ public class ReservaWebService {
                   FROM reserva r
                   JOIN usuario u ON u.id = r.usuario_id
                   JOIN vaga v ON v.id = r.vaga_id
+                  JOIN nivel n ON n.id = v.nivel_id
+                  JOIN estacionamento e ON e.id = n.estacionamento_id
+                  JOIN tipo_vaga tv ON tv.id = v.tipo_vaga_id
                  WHERE UPPER(u.email) = UPPER(:email)
                  ORDER BY r.criado_em DESC
                  FETCH FIRST 20 ROWS ONLY
@@ -90,6 +108,11 @@ public class ReservaWebService {
                        u.email,
                        r.vaga_id,
                        v.codigo,
+                       e.id,
+                       e.nome,
+                       n.nome,
+                       tv.nome,
+                       tv.tarifa_por_minuto,
                        r.estado,
                        TO_CHAR(r.criado_em, :dateFormat),
                        TO_CHAR(r.inicio_previsto, :dateFormat),
@@ -103,6 +126,9 @@ public class ReservaWebService {
                   FROM reserva r
                   JOIN usuario u ON u.id = r.usuario_id
                   JOIN vaga v ON v.id = r.vaga_id
+                  JOIN nivel n ON n.id = v.nivel_id
+                  JOIN estacionamento e ON e.id = n.estacionamento_id
+                  JOIN tipo_vaga tv ON tv.id = v.tipo_vaga_id
                  ORDER BY r.criado_em DESC
                  FETCH FIRST 30 ROWS ONLY
                 """, null);
@@ -177,14 +203,15 @@ public class ReservaWebService {
     public List<SensorEventoWebDto> listarEventosRecentes() {
         @SuppressWarnings("unchecked")
         List<Object[]> rows = em.createNativeQuery("""
-                SELECT se.id,
-                       se.sensor_id,
-                       se.vaga_id,
+                SELECT COALESCE(s.identificador_externo, s.modelo, 'Sensor vinculado'),
+                       v.codigo,
                        se.status,
                        TO_CHAR(se.ocorrido_em, :dateFormat),
                        TO_CHAR(se.recebido_em, :dateFormat),
                        SUBSTR(se.payload, 1, 160)
                   FROM sensor_evento se
+                  LEFT JOIN sensor s ON s.id = se.sensor_id
+                  LEFT JOIN vaga v ON v.id = se.vaga_id
                  ORDER BY se.recebido_em DESC
                  FETCH FIRST 15 ROWS ONLY
                 """)
@@ -193,13 +220,12 @@ public class ReservaWebService {
 
         return rows.stream()
                 .map(row -> new SensorEventoWebDto(
-                        toLong(row[0]),
-                        toLong(row[1]),
-                        toLong(row[2]),
+                        text(row[0]),
+                        text(row[1]),
+                        text(row[2]),
                         text(row[3]),
                         text(row[4]),
-                        text(row[5]),
-                        text(row[6])
+                        text(row[5])
                 ))
                 .toList();
     }
@@ -214,24 +240,37 @@ public class ReservaWebService {
         List<Object[]> rows = query.getResultList();
 
         return rows.stream()
-                .map(row -> new ReservaWebDto(
-                        toLong(row[0]),
-                        toLong(row[1]),
-                        text(row[2]),
-                        toLong(row[3]),
-                        text(row[4]),
-                        text(row[5]),
-                        text(row[6]),
-                        text(row[7]),
-                        toInteger(row[8]),
-                        toInteger(row[9]),
-                        toInteger(row[10]),
-                        text(row[11]),
-                        text(row[12]),
-                        text(row[13]),
-                        text(row[14])
-                ))
+                .map(this::toReservaWebDto)
                 .toList();
+    }
+
+    private ReservaWebDto toReservaWebDto(Object[] row) {
+        var tarifaPorMinuto = toBigDecimal(row[9]);
+        var duracaoMinutos = toInteger(row[13]);
+        var antecedenciaMinutos = toInteger(row[14]);
+        return new ReservaWebDto(
+                toLong(row[0]),
+                toLong(row[1]),
+                text(row[2]),
+                toLong(row[3]),
+                text(row[4]),
+                toLong(row[5]),
+                text(row[6]),
+                text(row[7]),
+                text(row[8]),
+                tarifaPorMinuto,
+                reservaValorService.calcularSePossivel(tarifaPorMinuto, duracaoMinutos, antecedenciaMinutos),
+                text(row[10]),
+                text(row[11]),
+                text(row[12]),
+                duracaoMinutos,
+                antecedenciaMinutos,
+                toInteger(row[15]),
+                text(row[16]),
+                text(row[17]),
+                text(row[18]),
+                text(row[19])
+        );
     }
 
     private boolean reservaPertenceAoUsuario(String email, Long reservaId) {
@@ -258,6 +297,10 @@ public class ReservaWebService {
 
     private static Integer toInteger(Object value) {
         return value == null ? null : ((Number) value).intValue();
+    }
+
+    private static BigDecimal toBigDecimal(Object value) {
+        return value == null ? null : new BigDecimal(value.toString());
     }
 
     private static String text(Object value) {

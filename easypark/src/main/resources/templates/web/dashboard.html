@@ -11,22 +11,41 @@
 <main class="page">
     <section class="hero">
         <div>
-            <p class="eyebrow">Painel web</p>
-            <h1 th:text="'Bem-vindo, ' + ${username}">Bem-vindo</h1>
-            <p>Consulte vagas e acompanhe status usando os dados atuais do banco Oracle.</p>
+            <p class="eyebrow">Motorista</p>
+            <h1 th:text="${'Para onde vamos, ' + username + '?'}">Para onde vamos?</h1>
+            <p>Informe um destino para encontrar estacionamentos cadastrados perto do local desejado.</p>
+
+            <form th:action="@{/web/estacionamentos}" method="get" class="action-form">
+                <label for="destino">Destino</label>
+                <input id="destino" name="destino" type="search"
+                       placeholder="Ex.: Paulista, Centro, 01310-100">
+
+                <div class="form-grid">
+                    <div>
+                        <label for="lat">Latitude opcional</label>
+                        <input id="lat" name="lat" type="number" step="0.000001" placeholder="-23.561414">
+                    </div>
+                    <div>
+                        <label for="lng">Longitude opcional</label>
+                        <input id="lng" name="lng" type="number" step="0.000001" placeholder="-46.655881">
+                    </div>
+                </div>
+
+                <button type="submit">Buscar estacionamentos</button>
+            </form>
         </div>
         <img src="https://images.unsplash.com/photo-1573348722427-f1d6819fdf98?auto=format&fit=crop&w=900&q=80"
              alt="Garagem de estacionamento iluminada">
     </section>
 
     <section class="summary-grid" aria-label="Acoes principais">
-        <a th:href="@{/web/vagas}" class="action-tile">
-            <strong>Consultar vagas</strong>
-            <span>Filtros por status, estacionamento, nivel e tipo.</span>
+        <a th:href="@{/web/estacionamentos}" class="action-tile">
+            <strong>Ver estacionamentos</strong>
+            <span>Escolha um local e veja vagas disponiveis por estacionamento.</span>
         </a>
         <a th:href="@{/web/minhas-reservas}" class="action-tile">
             <strong>Minhas reservas</strong>
-            <span>Acompanhe pre-reservas e atualize o ETA.</span>
+            <span>Acompanhe pre-reservas, ETA e valor previsto.</span>
         </a>
         <a sec:authorize="hasAnyRole('OPERADOR','ADMIN')" th:href="@{/web/operador}" class="action-tile">
             <strong>Painel operacional</strong>
@@ -35,55 +54,14 @@
     </section>
 
     <section>
-        <h2>Estacionamentos recentes</h2>
-        <table>
-            <thead>
-            <tr>
-                <th>ID</th>
-                <th>Nome</th>
-                <th>Espera</th>
-                <th>Tolerancia</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="est : ${estacionamentos}">
-                <td th:text="${est.id()}">1</td>
-                <td th:text="${est.nome()}">Estacionamento</td>
-                <td th:text="${est.esperaMinutos()}">10</td>
-                <td th:text="${est.toleranciaMinutos()}">5</td>
-            </tr>
-            <tr th:if="${#lists.isEmpty(estacionamentos)}">
-                <td colspan="4">Nenhum estacionamento encontrado.</td>
-            </tr>
-            </tbody>
-        </table>
-    </section>
-
-    <section>
-        <h2>Vagas recentes</h2>
-        <table>
-            <thead>
-            <tr>
-                <th>ID</th>
-                <th>Codigo</th>
-                <th>Nivel</th>
-                <th>Tipo</th>
-                <th>Ativa</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="vaga : ${vagas}">
-                <td><a th:href="@{/web/vagas/{id}(id=${vaga.id()})}" th:text="${vaga.id()}">1</a></td>
-                <td th:text="${vaga.codigo()}">A01</td>
-                <td th:text="${vaga.nivelId()}">1</td>
-                <td th:text="${vaga.tipoVagaId()}">1</td>
-                <td th:text="${vaga.ativa()} ? 'Sim' : 'Nao'">Sim</td>
-            </tr>
-            <tr th:if="${#lists.isEmpty(vagas)}">
-                <td colspan="5">Nenhuma vaga encontrada.</td>
-            </tr>
-            </tbody>
-        </table>
+        <p class="eyebrow">Sprint 3</p>
+        <h2>Fluxo implementado</h2>
+        <ol class="task-list">
+            <li>Buscar destino e escolher estacionamento.</li>
+            <li>Selecionar vaga disponivel e criar pre-reserva.</li>
+            <li>Acompanhar reserva e atualizar ETA.</li>
+            <li>Operador simula sensores e executa timeouts.</li>
+        </ol>
     </section>
 </main>
 <div th:replace="~{web/fragments :: footer}"></div>

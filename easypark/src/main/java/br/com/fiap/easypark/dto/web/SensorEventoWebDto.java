@@ -1,9 +1,8 @@
 package br.com.fiap.easypark.dto.web;
 
 public record SensorEventoWebDto(
-        Long id,
-        Long sensorId,
-        Long vagaId,
+        String sensor,
+        String vagaCodigo,
         String status,
         String ocorridoEm,
         String recebidoEm,
