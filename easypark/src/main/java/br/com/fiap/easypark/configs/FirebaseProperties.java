@@ -6,6 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public record FirebaseProperties(
         boolean enabled,
         String projectId,
+        String credentialsJson,
         String credentialsPath,
         String defaultRole,
         String allowedOrigins
@@ -21,6 +22,10 @@ public record FirebaseProperties(
 
     public boolean hasCredentialsPath() {
         return !blank(credentialsPath);
+    }
+
+    public boolean hasCredentialsJson() {
+        return !blank(credentialsJson);
     }
 
     private static boolean blank(String value) {

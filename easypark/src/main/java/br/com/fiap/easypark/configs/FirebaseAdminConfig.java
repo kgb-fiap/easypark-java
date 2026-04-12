@@ -10,8 +10,10 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 @Configuration
 @EnableConfigurationProperties(FirebaseProperties.class)
@@ -25,7 +27,11 @@ public class FirebaseAdminConfig {
         }
 
         FirebaseOptions.Builder options = FirebaseOptions.builder();
-        if (properties.hasCredentialsPath()) {
+        if (properties.hasCredentialsJson()) {
+            try (var input = new ByteArrayInputStream(properties.credentialsJson().getBytes(StandardCharsets.UTF_8))) {
+                options.setCredentials(GoogleCredentials.fromStream(input));
+            }
+        } else if (properties.hasCredentialsPath()) {
             try (var input = new FileInputStream(properties.credentialsPath())) {
                 options.setCredentials(GoogleCredentials.fromStream(input));
             }
