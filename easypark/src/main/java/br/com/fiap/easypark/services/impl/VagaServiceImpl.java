@@ -7,6 +7,7 @@ import br.com.fiap.easypark.entities.Nivel;
 import br.com.fiap.easypark.entities.TipoVaga;
 import br.com.fiap.easypark.entities.Vaga;
 import br.com.fiap.easypark.entities.VagaStatus;
+import br.com.fiap.easypark.entities.enums.StatusVaga;
 import br.com.fiap.easypark.exceptions.EntityNotFoundException;
 import br.com.fiap.easypark.mappers.VagaMapper;
 import br.com.fiap.easypark.repositories.NivelRepository;
@@ -14,14 +15,12 @@ import br.com.fiap.easypark.repositories.TipoVagaRepository;
 import br.com.fiap.easypark.repositories.VagaRepository;
 import br.com.fiap.easypark.repositories.VagaStatusRepository;
 import br.com.fiap.easypark.services.VagaService;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import br.com.fiap.easypark.entities.enums.StatusVaga;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.data.domain.Page;
 
 import java.util.List;
-
 
 @Service
 public class VagaServiceImpl implements VagaService {
@@ -47,7 +46,7 @@ public class VagaServiceImpl implements VagaService {
     @Override
     @Transactional(readOnly = true)
     public PageResponse<VagaOutDto> search(StatusVaga status, Long nivelId, Long tipoVagaId, Long estacionamentoId, Pageable pageable) {
-        Page<Vaga> page = vagaRepo.search(status, nivelId, tipoVagaId, estacionamentoId, pageable); // <— aqui
+        Page<Vaga> page = vagaRepo.search(status == null ? null : status.name(), nivelId, tipoVagaId, estacionamentoId, pageable);
         var content = page.getContent().stream().map(mapper::toOut).toList();
         return new PageResponse<>(
                 content,
@@ -64,13 +63,13 @@ public class VagaServiceImpl implements VagaService {
     @Override
     public VagaOutDto create(VagaInDto in) {
         if (vagaRepo.existsByNivelIdAndCodigoIgnoreCase(in.nivelId(), in.codigo())) {
-            throw new IllegalArgumentException("Já existe uma vaga com código '" + in.codigo()
-                    + "' no nível " + in.nivelId());
+            throw new IllegalArgumentException("Ja existe uma vaga com codigo '" + in.codigo()
+                    + "' no nivel " + in.nivelId());
         }
         Nivel nivel = nivelRepo.findById(in.nivelId())
-                .orElseThrow(() -> new EntityNotFoundException("Nível " + in.nivelId() + " não encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Nivel " + in.nivelId() + " nao encontrado"));
         TipoVaga tipo = tipoRepo.findById(in.tipoVagaId())
-                .orElseThrow(() -> new EntityNotFoundException("TipoVaga " + in.tipoVagaId() + " não encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("TipoVaga " + in.tipoVagaId() + " nao encontrado"));
 
         Vaga saved = vagaRepo.save(mapper.toEntity(in, nivel, tipo));
         return mapper.toOut(saved);
@@ -86,7 +85,7 @@ public class VagaServiceImpl implements VagaService {
     @Override
     public VagaOutDto findById(Long id) {
         Vaga v = vagaRepo.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Vaga " + id + " não encontrada"));
+                .orElseThrow(() -> new EntityNotFoundException("Vaga " + id + " nao encontrada"));
         return mapper.toOut(v);
     }
 
@@ -94,21 +93,19 @@ public class VagaServiceImpl implements VagaService {
     @Override
     public VagaOutDto update(Long id, VagaInDto in) {
         Vaga vaga = vagaRepo.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Vaga " + id + " não encontrada"));
+                .orElseThrow(() -> new EntityNotFoundException("Vaga " + id + " nao encontrada"));
 
         boolean mudouCodigo = !vaga.getCodigo().equalsIgnoreCase(in.codigo());
-        boolean mudouNivel  = !vaga.getNivel().getId().equals(in.nivelId());
-        if (mudouCodigo || mudouNivel) {
-            if (vagaRepo.existsByNivelIdAndCodigoIgnoreCase(in.nivelId(), in.codigo())) {
-                throw new IllegalArgumentException("Já existe uma vaga com código '" + in.codigo()
-                        + "' no nível " + in.nivelId());
-            }
+        boolean mudouNivel = !vaga.getNivel().getId().equals(in.nivelId());
+        if ((mudouCodigo || mudouNivel) && vagaRepo.existsByNivelIdAndCodigoIgnoreCase(in.nivelId(), in.codigo())) {
+            throw new IllegalArgumentException("Ja existe uma vaga com codigo '" + in.codigo()
+                    + "' no nivel " + in.nivelId());
         }
 
         Nivel nivel = nivelRepo.findById(in.nivelId())
-                .orElseThrow(() -> new EntityNotFoundException("Nível " + in.nivelId() + " não encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Nivel " + in.nivelId() + " nao encontrado"));
         TipoVaga tipo = tipoRepo.findById(in.tipoVagaId())
-                .orElseThrow(() -> new EntityNotFoundException("TipoVaga " + in.tipoVagaId() + " não encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("TipoVaga " + in.tipoVagaId() + " nao encontrado"));
 
         mapper.update(vaga, in, nivel, tipo);
         return mapper.toOut(vaga);
@@ -118,7 +115,7 @@ public class VagaServiceImpl implements VagaService {
     @Override
     public void delete(Long id) {
         if (!vagaRepo.existsById(id)) {
-            throw new EntityNotFoundException("Vaga " + id + " não encontrada");
+            throw new EntityNotFoundException("Vaga " + id + " nao encontrada");
         }
         vagaRepo.deleteById(id);
     }
@@ -132,7 +129,6 @@ public class VagaServiceImpl implements VagaService {
     @Transactional(readOnly = true)
     @Override
     public List<VagaOutDto> findByStatus(StatusVaga status) {
-        // Status em VAGA_STATUS é String (ex.: LIVRE/OCUPADA/DESCONHECIDO)
         var list = vagaRepo.findByStatusIgnoreCase(status.name());
         return list.stream().map(mapper::toOut).toList();
     }
