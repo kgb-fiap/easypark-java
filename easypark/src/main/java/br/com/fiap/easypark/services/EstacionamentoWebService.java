@@ -57,12 +57,20 @@ public class EstacionamentoWebService {
                        tv.eh_moto,
                        NVL(vs.status_ocupacao, 'DESCONHECIDO'),
                        TO_CHAR(vs.ultimo_ocorrido, 'YYYY-MM-DD HH24:MI TZH:TZM'),
-                       vs.sensor_id
+                       vs.sensor_id,
+                       MAX(CASE
+                             WHEN r.estado IN ('PRE_RESERVA','RESERVA','OCUPADA') THEN r.estado
+                             ELSE NULL
+                           END) AS reserva_ativa_estado
                   FROM vaga v
                   JOIN nivel n ON n.id = v.nivel_id
                   JOIN tipo_vaga tv ON tv.id = v.tipo_vaga_id
                   LEFT JOIN vaga_status vs ON vs.vaga_id = v.id
+                  LEFT JOIN reserva r ON r.vaga_id = v.id
                  WHERE n.estacionamento_id = :estacionamentoId
+                 GROUP BY v.id, v.codigo, v.ativa, n.nome, n.ordem, tv.nome, tv.tarifa_por_minuto,
+                          tv.eh_eletrica, tv.eh_acessivel, tv.eh_moto, vs.status_ocupacao,
+                          vs.ultimo_ocorrido, vs.sensor_id
                  ORDER BY NVL(n.ordem, 999), n.nome, v.codigo
                 """)
                 .setParameter("estacionamentoId", estacionamentoId)
@@ -117,6 +125,7 @@ public class EstacionamentoWebService {
                        SUM(CASE WHEN v.id IS NOT NULL
                                   AND NVL(v.ativa, 'N') = 'Y'
                                   AND NVL(vs.status_ocupacao, 'DESCONHECIDO') = 'LIVRE'
+                                  AND ar.vaga_id IS NULL
                                 THEN 1 ELSE 0 END),
                        CASE
                          WHEN :latitude IS NOT NULL
@@ -138,6 +147,11 @@ public class EstacionamentoWebService {
                   LEFT JOIN nivel n ON n.estacionamento_id = e.id
                   LEFT JOIN vaga v ON v.nivel_id = n.id
                   LEFT JOIN vaga_status vs ON vs.vaga_id = v.id
+                  LEFT JOIN (
+                    SELECT DISTINCT vaga_id
+                      FROM reserva
+                     WHERE estado IN ('PRE_RESERVA','RESERVA','OCUPADA')
+                  ) ar ON ar.vaga_id = v.id
                  WHERE (:id IS NULL OR e.id = :id)
                    AND (:destinoBusca IS NULL OR UPPER(
                         e.nome || ' ' ||
@@ -237,6 +251,7 @@ public class EstacionamentoWebService {
                 text(row[10]),
                 text(row[11]),
                 toLong(row[12]),
+                text(row[13]),
                 reservaValorService.calcularSePossivel(tarifa, 60, 15)
         );
     }

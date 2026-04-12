@@ -37,6 +37,8 @@
                     <dd th:text="${vaga.valorPrevistoPadrao() == null ? 'Indisponivel' : 'R$ ' + #numbers.formatDecimal(vaga.valorPrevistoPadrao(), 1, 2)}">R$ 10,00</dd>
                     <dt>Sensor</dt>
                     <dd th:text="${vaga.sensorId() == null ? 'Sem sensor' : 'Sensor associado'}">Sensor</dd>
+                    <dt>Disponibilidade</dt>
+                    <dd th:text="${vaga.disponibilidade()}">Disponivel para pre-reserva.</dd>
                 </dl>
 
                 <form th:if="${vaga.podeReservar()}"
@@ -57,7 +59,7 @@
 
                     <button type="submit">Criar pre-reserva</button>
                 </form>
-                <p th:unless="${vaga.podeReservar()}" class="muted">Vaga indisponivel para reserva agora.</p>
+                <p th:unless="${vaga.podeReservar()}" class="muted" th:text="${vaga.disponibilidade()}">Vaga indisponivel para reserva agora.</p>
             </article>
         </div>
         <p th:if="${#lists.isEmpty(vagas)}">Nenhuma vaga cadastrada para este estacionamento.</p>

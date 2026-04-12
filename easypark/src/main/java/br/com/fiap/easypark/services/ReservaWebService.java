@@ -316,11 +316,21 @@ public class ReservaWebService {
                 if (oraIndex >= 0) {
                     var lineEnd = message.indexOf('\n', oraIndex);
                     var firstLine = lineEnd >= 0 ? message.substring(oraIndex, lineEnd) : message.substring(oraIndex);
-                    return firstLine.replaceAll("\\s+", " ").trim();
+                    return friendlyDatabaseMessage(firstLine.replaceAll("\\s+", " ").trim());
                 }
             }
             current = current.getCause();
         }
         return "Nao foi possivel concluir a operacao no banco de dados.";
+    }
+
+    private static String friendlyDatabaseMessage(String message) {
+        if (message.contains("UQ_VAGA_RESERVA_ATIVA")) {
+            return "Esta vaga ja possui uma reserva ativa. Escolha outra vaga ou execute os timeouts antes de tentar novamente.";
+        }
+        if (message.contains("UQ_USUARIO_PRERESERVA")) {
+            return "Este usuario ja possui uma pre-reserva ativa. Atualize ou finalize a reserva atual antes de criar outra.";
+        }
+        return message;
     }
 }

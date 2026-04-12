@@ -16,10 +16,11 @@ public record VagaWebDto(
         String status,
         String ultimoOcorrido,
         Long sensorId,
+        String reservaAtivaEstado,
         BigDecimal valorPrevistoPadrao
 ) {
     public boolean podeReservar() {
-        return ativa && "LIVRE".equalsIgnoreCase(status);
+        return ativa && "LIVRE".equalsIgnoreCase(status) && reservaAtivaEstado == null;
     }
 
     public String caracteristicas() {
@@ -38,5 +39,18 @@ public record VagaWebDto(
             text.append(", ");
         }
         text.append(label);
+    }
+
+    public String disponibilidade() {
+        if (!ativa) {
+            return "Vaga inativa.";
+        }
+        if (reservaAtivaEstado != null) {
+            return "Vaga ja possui reserva ativa: " + reservaAtivaEstado + ".";
+        }
+        if (!"LIVRE".equalsIgnoreCase(status)) {
+            return "Vaga com status " + status + ".";
+        }
+        return "Disponivel para pre-reserva.";
     }
 }
