@@ -3,6 +3,7 @@ package br.com.fiap.easypark.mappers;
 import br.com.fiap.easypark.dto.EstacionamentoInDto;
 import br.com.fiap.easypark.dto.EstacionamentoOutDto;
 import br.com.fiap.easypark.dto.EnderecoResumoOutDto;
+import br.com.fiap.easypark.dto.OperadoraResumoOutDto;
 import br.com.fiap.easypark.entities.Endereco;
 import br.com.fiap.easypark.entities.Estacionamento;
 import br.com.fiap.easypark.entities.Operadora;
@@ -34,6 +35,18 @@ public class EstacionamentoMapper {
     }
 
     public EstacionamentoOutDto toOut(Estacionamento e, Long totalVagas) {
+        Operadora operadora = e.getOperadora();
+        OperadoraResumoOutDto operadoraResumo = null;
+        if (operadora != null) {
+            operadoraResumo = new OperadoraResumoOutDto(
+                    operadora.getId(),
+                    operadora.getCnpj(),
+                    operadora.getRazaoSocial(),
+                    operadora.getNomeFantasia(),
+                    operadora.getTelefone()
+            );
+        }
+
         Endereco endereco = e.getEndereco();
         EnderecoResumoOutDto enderecoResumo = null;
         if (endereco != null) {
@@ -49,6 +62,8 @@ public class EstacionamentoMapper {
         return new EstacionamentoOutDto(
                 e.getId(),
                 e.getNome(),
+                operadora != null ? operadora.getId() : null,
+                operadoraResumo,
                 endereco != null ? endereco.getId() : null,
                 enderecoResumo,
                 totalVagas,
