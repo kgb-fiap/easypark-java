@@ -229,6 +229,61 @@ img {
     margin-top: 0.25rem;
 }
 
+.label-with-help {
+    align-items: center;
+    display: inline-flex;
+    gap: 0.35rem;
+    width: fit-content;
+}
+
+.help-tooltip {
+    align-items: center;
+    background: var(--field);
+    border: 1px solid var(--line);
+    color: var(--accent-strong);
+    display: inline-flex;
+    font-size: 0.75rem;
+    height: 1.25rem;
+    justify-content: center;
+    line-height: 1;
+    padding: 0;
+    position: relative;
+    width: 1.25rem;
+}
+
+.help-tooltip:hover,
+.help-tooltip:focus {
+    background: var(--surface);
+}
+
+.help-tooltip-text {
+    background: var(--ink);
+    border-radius: 6px;
+    bottom: calc(100% + 0.5rem);
+    color: #ffffff;
+    font-size: 0.8rem;
+    font-weight: 400;
+    left: 50%;
+    line-height: 1.35;
+    max-width: min(260px, 80vw);
+    opacity: 0;
+    padding: 0.5rem 0.65rem;
+    pointer-events: none;
+    position: absolute;
+    text-align: left;
+    transform: translateX(-50%);
+    transition: opacity 120ms ease;
+    visibility: hidden;
+    width: max-content;
+    z-index: 10;
+}
+
+.help-tooltip:hover .help-tooltip-text,
+.help-tooltip:focus .help-tooltip-text {
+    opacity: 1;
+    visibility: visible;
+}
+
 .logout-form button {
     padding: 0.5rem 0.8rem;
 }

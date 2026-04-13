@@ -16,17 +16,17 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 public class SensorEventoForm {
-    @NotNull(message = "Informe o sensor.")
-    @Positive(message = "O sensor deve ser positivo.")
+    @NotNull(message = "Informe o sensor de presenca.")
+    @Positive(message = "O sensor de presenca deve ser valido.")
     private Long sensorId;
 
-    @NotBlank(message = "Informe o status.")
-    @Pattern(regexp = "LIVRE|OCUPADA|DESCONHECIDO", message = "Status deve ser LIVRE, OCUPADA ou DESCONHECIDO.")
+    @NotBlank(message = "Informe a leitura do sensor.")
+    @Pattern(regexp = "LIVRE|OCUPADA|DESCONHECIDO", message = "Leitura deve ser vaga livre, vaga ocupada ou desconhecida.")
     private String status = "OCUPADA";
 
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     private LocalDateTime ocorridoEm = LocalDateTime.now().withSecond(0).withNano(0);
 
-    @Size(max = 4000, message = "Payload deve ter no maximo 4000 caracteres.")
+    @Size(max = 4000, message = "Dados tecnicos devem ter no maximo 4000 caracteres.")
     private String payload = "{}";
 }

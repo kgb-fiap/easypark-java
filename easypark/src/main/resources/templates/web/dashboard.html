@@ -45,11 +45,11 @@
         </a>
         <a th:href="@{/web/minhas-reservas}" class="action-tile">
             <strong>Minhas reservas</strong>
-            <span>Acompanhe pre-reservas, ETA e valor previsto.</span>
+            <span>Acompanhe suas reservas, tempo ate chegar e valor previsto.</span>
         </a>
         <a sec:authorize="hasAnyRole('OPERADOR','ADMIN')" th:href="@{/web/operador}" class="action-tile">
             <strong>Painel operacional</strong>
-            <span>Eventos de sensor e timeouts operacionais.</span>
+            <span>Leituras dos sensores de presenca e rotinas de expiracao.</span>
         </a>
     </section>
 
@@ -58,9 +58,9 @@
         <h2>Fluxo implementado</h2>
         <ol class="task-list">
             <li>Buscar destino e escolher estacionamento.</li>
-            <li>Selecionar vaga disponivel e criar pre-reserva.</li>
-            <li>Acompanhar reserva e atualizar ETA.</li>
-            <li>Operador simula sensores e executa timeouts.</li>
+            <li>Selecionar vaga disponivel e reservar.</li>
+            <li>Acompanhar reserva e atualizar o tempo ate chegar.</li>
+            <li>Operador registra leituras dos sensores de presenca e executa expiracoes.</li>
         </ol>
     </section>
 </main>

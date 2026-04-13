@@ -46,11 +46,11 @@ public record VagaWebDto(
             return "Vaga inativa.";
         }
         if (reservaAtivaEstado != null) {
-            return "Vaga ja possui reserva ativa: " + reservaAtivaEstado + ".";
+            return "Vaga ja esta reservada.";
         }
         if (!"LIVRE".equalsIgnoreCase(status)) {
-            return "Vaga com status " + status + ".";
+            return "Vaga indisponivel no momento.";
         }
-        return "Disponivel para pre-reserva.";
+        return "Disponivel para reserva.";
     }
 }

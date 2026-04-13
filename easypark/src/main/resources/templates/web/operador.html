@@ -12,8 +12,8 @@
     <section>
         <p class="eyebrow">Area protegida</p>
         <h1>Painel operacional</h1>
-        <p>Registre eventos de sensor, acompanhe reservas e execute timeouts operacionais.</p>
-        <div th:if="${sensorEventoId}" class="alert success" th:text="${'Evento de sensor registrado: #' + sensorEventoId}">Evento</div>
+        <p>Registre leituras do sensor de presenca, acompanhe reservas e execute rotinas de expiracao.</p>
+        <div th:if="${sensorEventoId}" class="alert success" th:text="${'Leitura do sensor registrada: #' + sensorEventoId}">Leitura</div>
         <div th:if="${reservasCanceladas != null}" class="alert success" th:text="${'Reservas canceladas: ' + reservasCanceladas}">Reservas</div>
         <div th:if="${preReservasCanceladas != null}" class="alert success" th:text="${'Pre-reservas canceladas: ' + preReservasCanceladas}">Pre-reservas</div>
         <div th:if="${erro}" class="alert error" th:text="${erro}">Erro</div>
@@ -21,11 +21,11 @@
 
     <section class="detail-grid">
         <div>
-            <h2>Evento de sensor</h2>
+            <h2>Leitura do sensor de presenca</h2>
             <form th:action="@{/web/operador/sensor-eventos}" th:object="${sensorEventoForm}" method="post" class="action-form">
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
 
-                <label for="sensorId">Sensor</label>
+                <label for="sensorId">Sensor de presenca da vaga</label>
                 <select id="sensorId" th:field="*{sensorId}" required>
                     <option value="">Selecione</option>
                     <option th:each="sensor : ${sensores}"
@@ -33,42 +33,42 @@
                             th:text="${sensor.vagaCodigo() + ' - ' + sensor.modelo() + ' (' + sensor.identificadorExterno() + ')'}">Sensor</option>
                 </select>
 
-                <label for="status">Status</label>
+                <label for="status">Leitura</label>
                 <select id="status" th:field="*{status}">
-                    <option value="OCUPADA">OCUPADA</option>
-                    <option value="LIVRE">LIVRE</option>
-                    <option value="DESCONHECIDO">DESCONHECIDO</option>
+                    <option value="OCUPADA">Vaga ocupada</option>
+                    <option value="LIVRE">Vaga livre</option>
+                    <option value="DESCONHECIDO">Leitura desconhecida</option>
                 </select>
 
-                <label for="ocorridoEm">Ocorrido em</label>
+                <label for="ocorridoEm">Horario da leitura</label>
                 <input id="ocorridoEm" type="datetime-local" th:field="*{ocorridoEm}">
 
-                <label for="payload">Payload</label>
-                <textarea id="payload" th:field="*{payload}" rows="4"></textarea>
+                <label for="payload">Dados tecnicos</label>
+                <textarea id="payload" th:field="*{payload}" rows="4" placeholder='Ex.: {"origem":"sensor-presenca"}'></textarea>
 
-                <button type="submit">Registrar evento</button>
+                <button type="submit">Registrar leitura</button>
             </form>
         </div>
 
         <div>
-            <h2>Timeouts</h2>
+            <h2>Rotinas de expiracao</h2>
             <form th:action="@{/web/operador/timeouts/pre-reservas}" method="post" class="stacked-actions">
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-                <button type="submit">Executar timeouts de pre-reserva</button>
+                <button type="submit">Expirar pre-reservas vencidas</button>
             </form>
             <form th:action="@{/web/operador/timeouts/reservas}" method="post" class="stacked-actions">
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-                <button type="submit">Executar timeouts de reserva</button>
+                <button type="submit">Expirar reservas vencidas</button>
             </form>
         </div>
     </section>
 
     <section>
-        <h2>Sensores ativos</h2>
+        <h2>Sensores de presenca ativos</h2>
         <table>
             <thead>
             <tr>
-                <th>Codigo</th>
+                <th>Vaga</th>
                 <th>Modelo</th>
                 <th>Identificador</th>
             </tr>
@@ -80,7 +80,7 @@
                 <td th:text="${sensor.identificadorExterno()}">EXT</td>
             </tr>
             <tr th:if="${#lists.isEmpty(sensores)}">
-                <td colspan="5">Nenhum sensor ativo encontrado.</td>
+                <td colspan="3">Nenhum sensor de presenca ativo encontrado.</td>
             </tr>
             </tbody>
         </table>
@@ -97,10 +97,10 @@
                 <th>Vaga</th>
                 <th>Tipo</th>
                 <th>Estado</th>
-                <th>Inicio previsto</th>
-                <th>ETA</th>
+                <th>Chegada prevista</th>
+                <th>Tempo ate chegar</th>
                 <th>Valor previsto</th>
-                <th>Bloqueada</th>
+                <th>Vaga bloqueada</th>
             </tr>
             </thead>
             <tbody>
@@ -124,29 +124,29 @@
     </section>
 
     <section>
-        <h2>Eventos recentes</h2>
+        <h2>Leituras recentes</h2>
         <table>
             <thead>
             <tr>
-                <th>Sensor</th>
+                <th>Sensor de presenca</th>
                 <th>Vaga</th>
-                <th>Status</th>
-                <th>Ocorrido</th>
-                <th>Recebido</th>
-                <th>Payload</th>
+                <th>Leitura</th>
+                <th>Horario da leitura</th>
+                <th>Recebido pelo sistema</th>
+                <th>Dados tecnicos</th>
             </tr>
             </thead>
             <tbody>
             <tr th:each="evento : ${eventos}">
-                <td th:text="${evento.sensor()}">Sensor externo</td>
+                <td th:text="${evento.sensor()}">Sensor de presenca</td>
                 <td th:text="${evento.vagaCodigo() == null ? 'Sem vaga vinculada' : evento.vagaCodigo()}">A01</td>
-                <td th:text="${evento.status()}">OCUPADA</td>
+                <td th:text="${evento.status() == 'OCUPADA' ? 'Vaga ocupada' : (evento.status() == 'LIVRE' ? 'Vaga livre' : 'Leitura desconhecida')}">Vaga ocupada</td>
                 <td th:text="${evento.ocorridoEm()}">2026-04-11 15:00</td>
                 <td th:text="${evento.recebidoEm()}">2026-04-11 15:00</td>
                 <td th:text="${evento.payload()}">{}</td>
             </tr>
             <tr th:if="${#lists.isEmpty(eventos)}">
-                <td colspan="6">Nenhum evento recente encontrado.</td>
+                <td colspan="6">Nenhuma leitura recente encontrada.</td>
             </tr>
             </tbody>
         </table>

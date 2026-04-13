@@ -15,7 +15,7 @@
         <div th:if="${created}" class="alert success" th:text="${'Pre-reserva criada: #' + created}">Criada</div>
         <div th:if="${valorPrevisto}" class="alert success"
              th:text="${'Valor previsto: R$ ' + #numbers.formatDecimal(valorPrevisto, 1, 2)}">Valor previsto</div>
-        <div th:if="${etaStatus}" class="alert success" th:text="${'ETA: ' + etaStatus + ' - ' + etaMsg}">ETA</div>
+        <div th:if="${etaStatus}" class="alert success" th:text="${'Chegada: ' + etaStatus + ' - ' + etaMsg}">Chegada</div>
         <div th:if="${erro}" class="alert error" th:text="${erro}">Erro</div>
     </section>
 
@@ -29,13 +29,13 @@
                 <th>Vaga</th>
                 <th>Tipo</th>
                 <th>Estado</th>
-                <th>Inicio previsto</th>
-                <th>Duracao</th>
-                <th>Antecedencia</th>
-                <th>ETA atual</th>
+                <th>Chegada prevista</th>
+                <th>Tempo de uso</th>
+                <th>Bloquear antes</th>
+                <th>Tempo ate chegar</th>
                 <th>Valor previsto</th>
-                <th>Bloqueada</th>
-                <th>Atualizar ETA</th>
+                <th>Vaga bloqueada</th>
+                <th>Atualizar chegada</th>
             </tr>
             </thead>
             <tbody>
@@ -64,7 +64,7 @@
                         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
                         <input name="minutos" type="number" min="0" max="240" required
                                th:value="${reserva.etaMinutos() == null ? 10 : reserva.etaMinutos()}">
-                        <button type="submit">Atualizar</button>
+                        <button type="submit">Atualizar chegada</button>
                     </form>
                 </td>
             </tr>

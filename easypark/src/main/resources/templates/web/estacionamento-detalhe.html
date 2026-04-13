@@ -33,12 +33,12 @@
                 <dl>
                     <dt>Tarifa</dt>
                     <dd th:text="${'R$ ' + #numbers.formatDecimal(vaga.tarifaPorMinuto(), 1, 4) + ' / min'}">R$ 0.1500 / min</dd>
-                    <dt>Estimativa padrao</dt>
+                    <dt>Valor estimado</dt>
                     <dd th:text="${vaga.valorPrevistoPadrao() == null ? 'Indisponivel' : 'R$ ' + #numbers.formatDecimal(vaga.valorPrevistoPadrao(), 1, 2)}">R$ 10,00</dd>
                     <dt>Sensor</dt>
-                    <dd th:text="${vaga.sensorId() == null ? 'Sem sensor' : 'Sensor associado'}">Sensor</dd>
+                    <dd th:text="${vaga.sensorId() == null ? 'Sem sensor' : 'Sensor de presenca instalado'}">Sensor</dd>
                     <dt>Disponibilidade</dt>
-                    <dd th:text="${vaga.disponibilidade()}">Disponivel para pre-reserva.</dd>
+                    <dd th:text="${vaga.disponibilidade()}">Disponivel para reserva.</dd>
                 </dl>
 
                 <form th:if="${vaga.podeReservar()}"
@@ -48,16 +48,34 @@
                       class="action-form">
                     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
 
-                    <label th:for="${'inicioPrevisto-' + vaga.id()}">Inicio previsto</label>
+                    <div class="label-with-help">
+                        <label th:for="${'inicioPrevisto-' + vaga.id()}">Chegada prevista</label>
+                        <button type="button" class="help-tooltip" aria-label="Horario em que voce pretende chegar ao estacionamento.">
+                            i
+                            <span class="help-tooltip-text" role="tooltip">Horario em que voce pretende chegar ao estacionamento.</span>
+                        </button>
+                    </div>
                     <input th:id="${'inicioPrevisto-' + vaga.id()}" type="datetime-local" th:field="*{inicioPrevisto}" required>
 
-                    <label th:for="${'duracaoMinutos-' + vaga.id()}">Duracao em minutos</label>
+                    <div class="label-with-help">
+                        <label th:for="${'duracaoMinutos-' + vaga.id()}">Tempo de uso da vaga</label>
+                        <button type="button" class="help-tooltip" aria-label="Tempo estimado que seu carro ficara na vaga.">
+                            i
+                            <span class="help-tooltip-text" role="tooltip">Tempo estimado que seu carro ficara na vaga.</span>
+                        </button>
+                    </div>
                     <input th:id="${'duracaoMinutos-' + vaga.id()}" type="number" min="15" max="1440" th:field="*{duracaoMinutos}" required>
 
-                    <label th:for="${'antecedenciaMinutos-' + vaga.id()}">Antecedencia em minutos</label>
+                    <div class="label-with-help">
+                        <label th:for="${'antecedenciaMinutos-' + vaga.id()}">Bloquear vaga antes da chegada</label>
+                        <button type="button" class="help-tooltip" aria-label="Quando o ETA entrar nesse prazo, o sistema bloqueia a vaga para voce.">
+                            i
+                            <span class="help-tooltip-text" role="tooltip">Quando o ETA entrar nesse prazo, o sistema bloqueia a vaga para voce.</span>
+                        </button>
+                    </div>
                     <input th:id="${'antecedenciaMinutos-' + vaga.id()}" type="number" min="0" max="240" th:field="*{antecedenciaMinutos}" required>
 
-                    <button type="submit">Criar pre-reserva</button>
+                    <button type="submit">Reservar vaga</button>
                 </form>
                 <p th:unless="${vaga.podeReservar()}" class="muted" th:text="${vaga.disponibilidade()}">Vaga indisponivel para reserva agora.</p>
             </article>

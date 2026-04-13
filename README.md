@@ -376,23 +376,23 @@ Fluxo motorista:
 - criar `PRE_RESERVA` usando a procedure `reserva_ins`;
 - calcular valor previsto no Java usando dados do Oracle;
 - acompanhar reservas em `/web/minhas-reservas`;
-- atualizar ETA usando `user_eta_update_process`, permitindo a transicao `PRE_RESERVA -> RESERVA` quando a regra de antecedencia for atendida.
+- atualizar o tempo ate chegar usando `user_eta_update_process`, permitindo a transicao `PRE_RESERVA -> RESERVA` quando a regra de bloqueio antes da chegada for atendida.
 
 Fluxo operador:
 
 - consultar reservas recentes em `/web/operador`;
-- consultar sensores ativos;
-- registrar evento de sensor usando `sensor_evento_ins`, com a vaga derivada do sensor selecionado;
-- atualizar status da vaga por trigger `trg_sensor_evento_after_insert`;
-- executar timeouts com `reserva_prereserva_timeouts` e `reserva_timeouts`.
+- consultar sensores de presenca ativos;
+- registrar leitura do sensor de presenca usando `sensor_evento_ins`, com a vaga derivada do sensor selecionado;
+- atualizar a disponibilidade da vaga por trigger `trg_sensor_evento_after_insert`;
+- executar rotinas de expiracao com `reserva_prereserva_timeouts` e `reserva_timeouts`.
 
 Pagamento real ficou fora do escopo da Sprint 3.
 
 ### Validacoes
 
-- pre-reserva: inicio previsto presente e futuro/presente, duracao entre 15 e 1440 minutos, antecedencia entre 0 e 240 minutos;
-- ETA: valor entre 0 e 240 minutos;
-- evento de sensor: sensor ativo, vaga derivada do sensor selecionado, status `LIVRE`, `OCUPADA` ou `DESCONHECIDO`, payload com ate 4000 caracteres.
+- reserva: chegada prevista presente e futuro/presente, tempo de uso da vaga entre 15 e 1440 minutos, bloqueio antes da chegada entre 0 e 240 minutos;
+- tempo ate chegar: valor entre 0 e 240 minutos;
+- leitura do sensor de presenca: sensor ativo, vaga derivada do sensor selecionado, leitura `LIVRE`, `OCUPADA` ou `DESCONHECIDO`, dados tecnicos com ate 4000 caracteres.
 
 ### Roteiro de demonstracao
 
@@ -400,11 +400,11 @@ Pagamento real ficou fora do escopo da Sprint 3.
 2. Executar `.\mvnw.cmd spring-boot:run` dentro de `easypark`.
 3. Acessar `/web/login` com o usuario motorista.
 4. Buscar um destino em `/web` ou abrir `/web/estacionamentos`.
-5. Abrir um estacionamento, escolher uma vaga disponivel e criar uma pre-reserva.
-6. Acessar `/web/minhas-reservas` e atualizar o ETA.
+5. Abrir um estacionamento, escolher uma vaga disponivel e reservar.
+6. Acessar `/web/minhas-reservas` e atualizar o tempo ate chegar.
 7. Entrar com usuario operador.
-8. Acessar `/web/operador`, registrar evento de sensor e consultar o status atualizado.
-9. Executar timeouts apenas em cenario preparado, pois eles alteram dados reais do Oracle.
+8. Acessar `/web/operador`, registrar uma leitura do sensor de presenca e consultar a disponibilidade atualizada.
+9. Executar rotinas de expiracao apenas em cenario preparado, pois elas alteram dados reais do Oracle.
 10. Abrir `/swagger-ui.html` para conferir que a API REST continua disponivel.
 
 ### Limitacoes conhecidas
