@@ -176,13 +176,22 @@ Também é possível usar `FIREBASE_CREDENTIALS_PATH` apontando para o JSON da s
   # ou
   ./mvnw clean package && java -jar target/easypark-*.jar
   ```
+
+### 5) Ambientes de acesso
+- **Local**: `http://localhost:8080`
+- **Azure**: `https://api-easypark-agh6f3dugbemcfbh.brazilsouth-01.azurewebsites.net`
+
+O deploy no Azure é feito por CI/CD via GitHub Actions.
 ---
 
 ## Documentação da API (Swagger/OpenAPI)
 - **Swagger UI (local)**  
   - `http://localhost:8080/swagger-ui.html` **ou** `http://localhost:8080/swagger-ui/index.html`
+- **Swagger UI (Azure)**
+  - `https://api-easypark-agh6f3dugbemcfbh.brazilsouth-01.azurewebsites.net/swagger-ui.html`
 - **OpenAPI JSON**  
   - `http://localhost:8080/v3/api-docs`
+  - `https://api-easypark-agh6f3dugbemcfbh.brazilsouth-01.azurewebsites.net/v3/api-docs`
 
 ---
 
@@ -276,8 +285,11 @@ O frontend principal em React ainda nao consome os fluxos REST de negocio, mas o
 ### URLs web
 
 - Login web: `http://localhost:8080/web/login`
+- Login web Azure: `https://api-easypark-agh6f3dugbemcfbh.brazilsouth-01.azurewebsites.net/web/login`
 - Busca de destino: `http://localhost:8080/web`
+- Busca de destino Azure: `https://api-easypark-agh6f3dugbemcfbh.brazilsouth-01.azurewebsites.net/web`
 - Consulta de estacionamentos: `http://localhost:8080/web/estacionamentos`
+- Consulta de estacionamentos Azure: `https://api-easypark-agh6f3dugbemcfbh.brazilsouth-01.azurewebsites.net/web/estacionamentos`
 - Detalhe de estacionamento e vagas: `http://localhost:8080/web/estacionamentos/{id}`
 - Rotas antigas de vagas: `/web/vagas` e `/web/vagas/{id}` redirecionam para o fluxo por estacionamento
 - Minhas reservas: `http://localhost:8080/web/minhas-reservas`
