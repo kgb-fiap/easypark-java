@@ -145,6 +145,7 @@ public class ReservaWebService {
     @Transactional
     public Long registrarEventoSensor(SensorEventoForm form) {
         var ocorridoEm = form.getOcorridoEm() == null ? LocalDateTime.now() : form.getOcorridoEm();
+        var vagaId = buscarVagaIdPorSensor(form.getSensorId());
         var sp = em.createStoredProcedureQuery("sensor_evento_ins");
         sp.registerStoredProcedureParameter("p_sensor_id", Long.class, ParameterMode.IN);
         sp.registerStoredProcedureParameter("p_vaga_id", Long.class, ParameterMode.IN);
@@ -153,13 +154,34 @@ public class ReservaWebService {
         sp.registerStoredProcedureParameter("p_payload", String.class, ParameterMode.IN);
         sp.registerStoredProcedureParameter("p_id", Long.class, ParameterMode.OUT);
         sp.setParameter("p_sensor_id", form.getSensorId());
-        sp.setParameter("p_vaga_id", form.getVagaId());
+        sp.setParameter("p_vaga_id", vagaId);
         sp.setParameter("p_ocorrido", toOffsetDateTime(ocorridoEm));
         sp.setParameter("p_status", form.getStatus());
         sp.setParameter("p_payload", form.getPayload());
         executeProcedure(sp);
 
         return toLong(sp.getOutputParameterValue("p_id"));
+    }
+
+    private Long buscarVagaIdPorSensor(Long sensorId) {
+        if (sensorId == null) {
+            throw new IllegalArgumentException("Informe o sensor.");
+        }
+
+        var rows = em.createNativeQuery("""
+                SELECT vaga_id
+                  FROM sensor
+                 WHERE id = :sensorId
+                   AND ativo = 'Y'
+                """)
+                .setParameter("sensorId", sensorId)
+                .getResultList();
+
+        if (rows.isEmpty()) {
+            throw new IllegalArgumentException("Sensor ativo nao encontrado para registrar o evento.");
+        }
+
+        return toLong(rows.getFirst());
     }
 
     private void executeProcedure(jakarta.persistence.StoredProcedureQuery sp) {

@@ -33,14 +33,6 @@
                             th:text="${sensor.vagaCodigo() + ' - ' + sensor.modelo() + ' (' + sensor.identificadorExterno() + ')'}">Sensor</option>
                 </select>
 
-                <label for="vagaId">Vaga vinculada ao sensor</label>
-                <select id="vagaId" th:field="*{vagaId}" required>
-                    <option value="">Selecione</option>
-                    <option th:each="sensor : ${sensores}"
-                            th:value="${sensor.vagaId()}"
-                            th:text="${sensor.vagaCodigo()}">A01</option>
-                </select>
-
                 <label for="status">Status</label>
                 <select id="status" th:field="*{status}">
                     <option value="OCUPADA">OCUPADA</option>

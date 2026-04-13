@@ -2,12 +2,21 @@
 
 > Sistema multi-estacionamento com **reservas em estágios** (PRE_RESERVA → RESERVA → OCUPADA → PAGA/CANCELADA), **monitoramento em tempo real** via sensores de vaga e **pagamento pós-uso**. Integra com **Oracle** e usa **ETA** (Google Maps Directions) para promover PRE_RESERVA → RESERVA.
 
-**Status atual:** Sprint 2 — evoluções de arquitetura, padronização de respostas, início de HATEOAS (maturidade REST nível 3) e documentação reforçada.  
-**Repositório:** `kgb-fiap/easypark-java`  
+**Status atual:** Sprint 3 — aplicação Spring Boot com API REST, interface web Thymeleaf, Flyway, Spring Security, integração Firebase opcional e fluxos acadêmicos de reserva/operação.
+**Repositório:** `kgb-fiap/easypark-java`
+
+---
+
+## Integrantes
+
+- **Gabriel Cruz Ferreira** — RM559613
+- **Kauã Ferreira dos Santos** — RM560992
+- **Vinicius da Silva Bitú** — RM560227
 
 ---
 
 ## Sumário
+- [Integrantes](#integrantes)
 - [Visão Geral](#visão-geral)
 - [Arquitetura](#arquitetura)
 - [Domínio e Modelo de Dados](#domínio-e-modelo-de-dados)
@@ -18,17 +27,21 @@
 - [Padrões REST e HATEOAS](#padrões-rest-e-hateoas)
 - [Testes (Postman)](#testes-postmaninsomnia)
 - [Evolução Sprint 1 → Sprint 2](#evolução-sprint-1--sprint-2)
-- [Equipe](#equipe)
-- [Roadmap (Sprints 3 e 4)](#roadmap-sprints-3-e-4)
+- [Sprint 3](#sprint-3)
+- [Roadmap](#roadmap)
 - [Anexos (Diagramas)](#anexos-diagramas)
 
 ---
 
 ## Visão Geral
-O **EasyPark** é um backend REST que orquestra:
+O **EasyPark** é uma aplicação Spring Boot com API REST e interface web acadêmica que orquestra:
 - **Reservas em estágios** com regra guiada por **ETA** (Google Maps) e **eventos de sensores**;
 - **Telemetria de vagas**: histórico (`SENSOR_EVENTO`) e cache de leitura (`VAGA_STATUS`);
-- **Pagamento pós-uso** (gateway planejado);
+- **Busca de estacionamentos e vagas** para o fluxo do motorista;
+- **Operação de sensores e timeouts** para o perfil operador;
+- **Controle de acesso** com Spring Security e integração opcional com Firebase Auth;
+- **Versionamento do banco Oracle** com Flyway;
+- **Pagamento pós-uso** (gateway planejado para evolução futura);
 - **Endereços** normalizados em **3FN** (UF/CIDADE/BAIRRO/ENDERECO).
 
 **Público-alvo:** motoristas urbanos (reserva e navegação até a vaga) e **operadoras/estacionamentos** (gestão de ocupação e rotatividade).
@@ -105,6 +118,10 @@ stateDiagram-v2
 - **Spring Boot** (Web, Validation)  
 - **Spring Data JPA**  
 - **Spring HATEOAS** 
+- **Spring Security**
+- **Thymeleaf** e **Thymeleaf Extras Spring Security**
+- **Flyway** e **Flyway Oracle**
+- **Firebase Admin SDK**
 - **Oracle** (JDBC, HikariCP)  
 - **springdoc-openapi** (Swagger UI)  
 - **Lombok** 
@@ -120,9 +137,12 @@ stateDiagram-v2
 - **Google Maps API Key**: *(ainda não está disponivel)*
 
 ### 2) Banco de dados
-Crie um schema e aplique o DDL (tabelas, FKs, índices, sequences/triggers).
+Crie ou reutilize um schema Oracle. O versionamento do banco é feito pelo Flyway em `src/main/resources/db/migration`.
 
-- **Scripts**: `docs/sql/ddl-easypark.sql` 
+- **Migrations da aplicação**: `src/main/resources/db/migration`
+- **Scripts históricos da Sprint 2**: `docs/sql`
+
+O Flyway usa `baseline-on-migrate=true` e `baseline-version=3`, permitindo conectar em um schema Oracle que já recebeu os scripts da Sprint 2 sem excluir os dados existentes.
 
 ### 3) Configuração da aplicação
 
@@ -135,9 +155,23 @@ spring.datasource.password=${DB_EASYPARK_PASS}
 
 > **Variáveis de ambiente**: `DB_EASYPARK_URL`, `DB_EASYPARK_USER`, `DB_EASYPARK_PASS`
 
+Configuração opcional para Firebase Auth:
+
+```powershell
+$env:FIREBASE_ENABLED="true"
+$env:FIREBASE_PROJECT_ID="seu-project-id"
+$env:FIREBASE_CREDENTIALS_JSON="{...json da service account em uma linha...}"
+$env:FIREBASE_ALLOWED_ORIGINS="http://localhost:5173,http://localhost:3000"
+$env:FIREBASE_DEFAULT_ROLE="MOTORISTA"
+```
+
+Também é possível usar `FIREBASE_CREDENTIALS_PATH` apontando para o JSON da service account local. O arquivo JSON não deve ser commitado.
+
 ### 4) Rodando a API
 - **Maven (dev)**
   ```bash
+  cd easypark
+  ./mvnw clean test
   ./mvnw spring-boot:run
   # ou
   ./mvnw clean package && java -jar target/easypark-*.jar
@@ -224,19 +258,7 @@ spring.datasource.password=${DB_EASYPARK_PASS}
 - [x] Coleção Postman em `docs/postman/`  
 - [x] Link de vídeo de apresentação ([EasyPark - Pitch](https://youtu.be/lVp7S25vAQ8?si=YolhGwtarLyjFa1c))
 
----
-
-## Equipe
-
-| Nome | Descrição/Responsabilidade |
-|---|---|
-| Gabriel Cruz | Arquiteto de Software, Desenvolvedor Backend, Manipulação de dados / Definir a arquitetura. Implementa funcionalidades. Implementa modelos de banco de dados. |
-| Kauã Ferreira | Scrum Master, Desenvolvedor Mobile, UX/UI Designer / Facilitar as cerimônias ágeis. Cria o aplicativo em React Native. Desenvolve interfaces e experiências. |
-| Vinicius Bitú | Infraestrutura e DevOps / Gerencia o ambiente em nuvem. |
-
----
-
-## Sprint 3 - Java Avancado
+## Sprint 3
 
 Esta sprint adiciona uma aplicacao web academica com Thymeleaf, Flyway para versionamento do banco Oracle, Spring Security para autenticacao e controle de acesso, e integracao backend com Firebase Authentication para o futuro frontend React.
 
@@ -254,8 +276,10 @@ O frontend principal em React ainda nao consome os fluxos REST de negocio, mas o
 ### URLs web
 
 - Login web: `http://localhost:8080/web/login`
-- Dashboard web: `http://localhost:8080/web`
-- Consulta de vagas: `http://localhost:8080/web/vagas`
+- Busca de destino: `http://localhost:8080/web`
+- Consulta de estacionamentos: `http://localhost:8080/web/estacionamentos`
+- Detalhe de estacionamento e vagas: `http://localhost:8080/web/estacionamentos/{id}`
+- Rotas antigas de vagas: `/web/vagas` e `/web/vagas/{id}` redirecionam para o fluxo por estacionamento
 - Minhas reservas: `http://localhost:8080/web/minhas-reservas`
 - Painel operador: `http://localhost:8080/web/operador`
 - Status Firebase: `http://localhost:8080/auth/firebase/status`
@@ -267,7 +291,7 @@ Os usuarios abaixo sao criados pela migration `V4__seed_sprint_3_security_users.
 
 | Perfil | E-mail | Senha | Permissoes |
 |---|---|---|---|
-| Motorista | `easypark.motorista@fiap.com.br` | `motorista123` | Acessa `/web`, `/web/vagas` e `/web/minhas-reservas` |
+| Motorista | `easypark.motorista@fiap.com.br` | `motorista123` | Acessa `/web`, `/web/estacionamentos` e `/web/minhas-reservas` |
 | Operador | `easypark.operador@fiap.com.br` | `operador123` | Acessa rotas de motorista e `/web/operador` |
 | Admin | `easypark.admin@fiap.com.br` | `admin123` | Acessa rotas de motorista e `/web/operador` |
 
@@ -316,12 +340,12 @@ Configuracao do backend:
 ```powershell
 $env:FIREBASE_ENABLED="true"
 $env:FIREBASE_PROJECT_ID="seu-project-id"
-$env:FIREBASE_CREDENTIALS_PATH="C:\caminho\service-account.json"
+$env:FIREBASE_CREDENTIALS_JSON="{...json da service account em uma linha...}"
 $env:FIREBASE_ALLOWED_ORIGINS="http://localhost:5173,http://localhost:3000"
 $env:FIREBASE_DEFAULT_ROLE="MOTORISTA"
 ```
 
-Se `FIREBASE_CREDENTIALS_PATH` nao for informado, a aplicacao tenta usar Application Default Credentials do Google. O arquivo JSON da service account nao deve ser commitado.
+Tambem e possivel usar `FIREBASE_CREDENTIALS_PATH` apontando para o JSON local da service account. Se `FIREBASE_CREDENTIALS_JSON` e `FIREBASE_CREDENTIALS_PATH` nao forem informados, a aplicacao tenta usar Application Default Credentials do Google. O arquivo JSON da service account nao deve ser commitado.
 
 Mapeamento de claims Firebase:
 
@@ -334,9 +358,11 @@ Mapeamento de claims Firebase:
 
 Fluxo motorista:
 
-- consultar vagas em `/web/vagas`;
-- abrir detalhe de uma vaga;
+- buscar destino em `/web`;
+- consultar estacionamentos em `/web/estacionamentos`;
+- abrir detalhe de um estacionamento e escolher uma vaga disponivel;
 - criar `PRE_RESERVA` usando a procedure `reserva_ins`;
+- calcular valor previsto no Java usando dados do Oracle;
 - acompanhar reservas em `/web/minhas-reservas`;
 - atualizar ETA usando `user_eta_update_process`, permitindo a transicao `PRE_RESERVA -> RESERVA` quando a regra de antecedencia for atendida.
 
@@ -344,7 +370,7 @@ Fluxo operador:
 
 - consultar reservas recentes em `/web/operador`;
 - consultar sensores ativos;
-- registrar evento de sensor usando `sensor_evento_ins`;
+- registrar evento de sensor usando `sensor_evento_ins`, com a vaga derivada do sensor selecionado;
 - atualizar status da vaga por trigger `trg_sensor_evento_after_insert`;
 - executar timeouts com `reserva_prereserva_timeouts` e `reserva_timeouts`.
 
@@ -352,17 +378,17 @@ Pagamento real ficou fora do escopo da Sprint 3.
 
 ### Validacoes
 
-- pre-reserva: inicio previsto presente e futuro/presente, duracao entre 15 e 720 minutos, antecedencia entre 0 e 240 minutos;
+- pre-reserva: inicio previsto presente e futuro/presente, duracao entre 15 e 1440 minutos, antecedencia entre 0 e 240 minutos;
 - ETA: valor entre 0 e 240 minutos;
-- evento de sensor: IDs positivos, status `LIVRE`, `OCUPADA` ou `DESCONHECIDO`, payload com ate 4000 caracteres.
+- evento de sensor: sensor ativo, vaga derivada do sensor selecionado, status `LIVRE`, `OCUPADA` ou `DESCONHECIDO`, payload com ate 4000 caracteres.
 
 ### Roteiro de demonstracao
 
 1. Executar `.\mvnw.cmd clean test` dentro de `easypark`.
 2. Executar `.\mvnw.cmd spring-boot:run` dentro de `easypark`.
 3. Acessar `/web/login` com o usuario motorista.
-4. Consultar uma vaga em `/web/vagas`.
-5. Criar uma pre-reserva para uma vaga livre.
+4. Buscar um destino em `/web` ou abrir `/web/estacionamentos`.
+5. Abrir um estacionamento, escolher uma vaga disponivel e criar uma pre-reserva.
 6. Acessar `/web/minhas-reservas` e atualizar o ETA.
 7. Entrar com usuario operador.
 8. Acessar `/web/operador`, registrar evento de sensor e consultar o status atualizado.
@@ -371,21 +397,20 @@ Pagamento real ficou fora do escopo da Sprint 3.
 
 ### Limitacoes conhecidas
 
-- A validacao automatica evitou criar pre-reservas validas, registrar eventos reais de sensor e executar timeouts para nao alterar dados ja carregados no Oracle da Sprint 2.
+- Os fluxos de pre-reserva, sensor e timeouts alteram dados reais do Oracle; para demonstracao, use massa de teste controlada.
 - O React segue como frontend principal futuro; nesta sprint o backend ja valida tokens Firebase, mas os fluxos REST de negocio ainda nao foram adaptados para exigir autenticacao Firebase obrigatoria.
 - A camada web Thymeleaf e academica e existe para atender aos requisitos da Sprint 3 Java.
 
 ### Documentacao da Sprint 3
 
-- Evolucao da Sprint 3: `easypark/docs/sprint-3-evolucao.md`
 - DER PlantUML: `easypark/docs/der-logico-plantUML.puml`
 - Scripts SQL historicos: `easypark/docs/sql`
 - Colecao Postman: `easypark/docs/postman`
 
 ---
 
-## Roadmap (Sprints 3 e 4)
-- **Autenticação/JWT** (usuários finais e operadores) e no-show por usuário.  
+## Roadmap
+- **React integrado à API REST** usando Firebase Auth como autenticação principal do frontend.
 - **Pagamento online integrado** (gateway BR: tokenização, idempotência).  
 - **Integração IoT avançada** (MQTT/Kafka; resiliência a falhas).  
 - **ETA automático** por reserva; navegação passo a passo.   
@@ -624,11 +649,3 @@ legend right
 endlegend
 @enduml
 ```
-
----
-
-## Integrantes
-
-- **Gabriel Cruz Ferreira** — RM559613  
-- **Kauã Ferreira dos Santos** — RM560992  
-- **Vinicius da Silva Bitú** — RM560227 

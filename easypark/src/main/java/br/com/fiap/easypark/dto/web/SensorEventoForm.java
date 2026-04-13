@@ -20,10 +20,6 @@ public class SensorEventoForm {
     @Positive(message = "O sensor deve ser positivo.")
     private Long sensorId;
 
-    @NotNull(message = "Informe a vaga.")
-    @Positive(message = "A vaga deve ser positiva.")
-    private Long vagaId;
-
     @NotBlank(message = "Informe o status.")
     @Pattern(regexp = "LIVRE|OCUPADA|DESCONHECIDO", message = "Status deve ser LIVRE, OCUPADA ou DESCONHECIDO.")
     private String status = "OCUPADA";

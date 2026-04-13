@@ -1,11 +1,335 @@
 {
   "info": {
-    "name": "EasyPark - Sprint 1 (FIAP)",
+    "name": "EasyPark - Sprint 3 (FIAP)",
     "_postman_id": "3420149b-a79f-4b7d-a19a-13afa0fe3b61",
-    "description": "Coleção de testes dos endpoints da API EasyPark para a Sprint 1. Inclui CRUD de Estacionamentos e Vagas, filtro por status, listagem por estacionamento e endpoints de jobs (opcional).",
+    "description": "Coleção de testes dos endpoints da API EasyPark para a Sprint 3. Inclui CRUD de Operadoras, Endereços, Estacionamentos e Vagas, filtros de vagas, jobs de reserva e smoke test da integração Firebase.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
+    {
+      "name": "Operadoras",
+      "item": [
+        {
+          "name": "Criar Operadora",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/operadoras",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "operadoras"
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cnpj\": \"5596{{$timestamp}}\",\n  \"razaoSocial\": \"EasyPark Operadora FIAP Ltda\",\n  \"nomeFantasia\": \"EasyPark FIAP\",\n  \"telefone\": \"11999990000\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201 CREATED', () => pm.response.to.have.status(201));",
+                  "try { var j = pm.response.json(); if (j && j.id) pm.environment.set('operadoraId', j.id); } catch(e) {}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listar Operadoras",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/operadoras",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "operadoras"
+              ]
+            },
+            "header": []
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 status', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Obter Operadora por ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/operadoras/{{operadoraId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "operadoras",
+                "{{operadoraId}}"
+              ]
+            },
+            "header": []
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 status', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Atualizar Operadora",
+          "request": {
+            "method": "PUT",
+            "url": {
+              "raw": "{{baseUrl}}/operadoras/{{operadoraId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "operadoras",
+                "{{operadoraId}}"
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cnpj\": \"5597{{$timestamp}}\",\n  \"razaoSocial\": \"EasyPark Operadora FIAP Atualizada Ltda\",\n  \"nomeFantasia\": \"EasyPark FIAP Atualizada\",\n  \"telefone\": \"11888880000\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 status', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Excluir Operadora",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/operadoras/{{operadoraId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "operadoras",
+                "{{operadoraId}}"
+              ]
+            },
+            "header": []
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('204 status', function () { pm.response.to.have.status(204); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Enderecos",
+      "item": [
+        {
+          "name": "Criar Endereco",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/enderecos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enderecos"
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cep\": \"01311000\",\n  \"logradouro\": \"Av. Paulista\",\n  \"numero\": \"1106\",\n  \"complemento\": \"FIAP Paulista\",\n  \"bairroId\": null,\n  \"latitude\": -23.564000,\n  \"longitude\": -46.652000\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201 CREATED', () => pm.response.to.have.status(201));",
+                  "try { var j = pm.response.json(); if (j && j.id) pm.environment.set('enderecoId', j.id); } catch(e) {}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listar Enderecos",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/enderecos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enderecos"
+              ]
+            },
+            "header": []
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 status', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Obter Endereco por ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/enderecos/{{enderecoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enderecos",
+                "{{enderecoId}}"
+              ]
+            },
+            "header": []
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 status', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Atualizar Endereco",
+          "request": {
+            "method": "PUT",
+            "url": {
+              "raw": "{{baseUrl}}/enderecos/{{enderecoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enderecos",
+                "{{enderecoId}}"
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cep\": \"01311000\",\n  \"logradouro\": \"Av. Paulista\",\n  \"numero\": \"1106\",\n  \"complemento\": \"FIAP Paulista - Atualizado\",\n  \"bairroId\": null,\n  \"latitude\": -23.564200,\n  \"longitude\": -46.651900\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 status', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Excluir Endereco",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/enderecos/{{enderecoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enderecos",
+                "{{enderecoId}}"
+              ]
+            },
+            "header": []
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('204 status', function () { pm.response.to.have.status(204); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
     {
       "name": "Estacionamentos",
       "item": [
@@ -30,7 +354,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"operadoraId\": \"{{operadoraId}}\",\n  \"nome\": \"Estac FIAP Paulista\",\n  \"endereco\": \"Av. Paulista, 1106\",\n  \"latitude\": -23.564,\n  \"longitude\": -46.652,\n  \"esperaMinutos\": 10,\n  \"toleranciaMinutos\": 5\n}"
+              "raw": "{\n  \"operadoraId\": {{operadoraId}},\n  \"nome\": \"Estac FIAP Paulista\",\n  \"enderecoId\": {{enderecoId}},\n  \"esperaMinutos\": 10,\n  \"toleranciaMinutos\": 5\n}"
             }
           },
           "event": [
@@ -40,7 +364,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test('201 CREATED', () => pm.response.to.have.status(201));",
-                  "try { var j = pm.response.json(); if (j && j.id) pm.collectionVariables.set('estacionamentoId', j.id); } catch(e) {}"
+                  "try { var j = pm.response.json(); if (j && j.id) pm.environment.set('estacionamentoId', j.id); } catch(e) {}"
                 ]
               }
             }
@@ -123,7 +447,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"operadoraId\": \"{{operadoraId}}\",\n  \"nome\": \"Estac FIAP Paulista - Atualizado\",\n  \"endereco\": \"Av. Paulista, 1106 - Bela Vista\",\n  \"latitude\": -23.5642,\n  \"longitude\": -46.6519,\n  \"esperaMinutos\": 12,\n  \"toleranciaMinutos\": 7\n}"
+              "raw": "{\n  \"operadoraId\": {{operadoraId}},\n  \"nome\": \"Estac FIAP Paulista - Atualizado\",\n  \"enderecoId\": {{enderecoId}},\n  \"esperaMinutos\": 12,\n  \"toleranciaMinutos\": 7\n}"
             }
           },
           "event": [
@@ -202,7 +526,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test('201 CREATED', () => pm.response.to.have.status(201));",
-                  "try { var j = pm.response.json(); if (j && j.id) pm.collectionVariables.set('vagaId', j.id); } catch(e) {}"
+                  "try { var j = pm.response.json(); if (j && j.id) pm.environment.set('vagaId', j.id); } catch(e) {}"
                 ]
               }
             }
@@ -552,6 +876,74 @@
           ]
         }
       ]
+    },
+    {
+      "name": "Firebase Auth",
+      "item": [
+        {
+          "name": "Status Firebase",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/auth/firebase/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "firebase",
+                "status"
+              ]
+            },
+            "header": []
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 status', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Usuario Firebase autenticado",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/auth/firebase/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "firebase",
+                "me"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{firebaseIdToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 com token valido ou 401 sem token', function () { pm.expect([200, 401, 403]).to.include(pm.response.code); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
     }
   ],
   "variable": [
@@ -562,6 +954,10 @@
     {
       "key": "operadoraId",
       "value": "1"
+    },
+    {
+      "key": "enderecoId",
+      "value": ""
     },
     {
       "key": "estacionamentoId",
@@ -582,6 +978,10 @@
     {
       "key": "reservaId",
       "value": "1"
+    },
+    {
+      "key": "firebaseIdToken",
+      "value": ""
     }
   ]
 }
