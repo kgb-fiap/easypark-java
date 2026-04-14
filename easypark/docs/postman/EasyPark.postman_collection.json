@@ -1,8 +1,8 @@
 {
   "info": {
-    "name": "EasyPark - Sprint 3 (FIAP)",
+    "name": "EasyPark - (FIAP)",
     "_postman_id": "3420149b-a79f-4b7d-a19a-13afa0fe3b61",
-    "description": "Coleção de testes dos endpoints da API EasyPark para a Sprint 3. Inclui CRUD de Operadoras, Endereços, Estacionamentos e Vagas, filtros de vagas, jobs de reserva e smoke test da integração Firebase.",
+    "description": "Coleção de testes dos endpoints da API EasyPark. Inclui CRUD de Operadoras, Endereços, Estacionamentos e Vagas, filtros de vagas, jobs de reserva e smoke test da integração Firebase.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
