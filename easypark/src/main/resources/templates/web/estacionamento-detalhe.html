@@ -10,7 +10,9 @@
 <div th:replace="~{web/fragments :: header('estacionamentos')}"></div>
 <main class="page">
     <section>
-        <a th:href="@{/web/estacionamentos}" class="secondary-link">Voltar para estacionamentos</a>
+        <div class="section-actions">
+            <a th:href="@{/web/estacionamentos}" class="secondary-link">Voltar para estacionamentos</a>
+        </div>
         <p class="eyebrow">Estacionamento</p>
         <h1 th:text="${estacionamento.nome()}">EasyPark Centro</h1>
         <p th:text="${estacionamento.enderecoCompleto()}">Endereco</p>
@@ -31,8 +33,6 @@
                 </div>
 
                 <dl>
-                    <dt>Tarifa</dt>
-                    <dd th:text="${'R$ ' + #numbers.formatDecimal(vaga.tarifaPorMinuto(), 1, 4) + ' / min'}">R$ 0.1500 / min</dd>
                     <dt>Valor estimado</dt>
                     <dd th:text="${vaga.valorPrevistoPadrao() == null ? 'Indisponivel' : 'R$ ' + #numbers.formatDecimal(vaga.valorPrevistoPadrao(), 1, 2)}">R$ 10,00</dd>
                     <dt>Sensor</dt>
@@ -64,7 +64,19 @@
                             <span class="help-tooltip-text" role="tooltip">Tempo estimado que seu carro ficara na vaga.</span>
                         </button>
                     </div>
-                    <input th:id="${'duracaoMinutos-' + vaga.id()}" type="number" min="15" max="1440" step="15" th:field="*{duracaoMinutos}" required>
+                    <div class="field-with-unit">
+                        <input th:id="${'duracaoMinutos-' + vaga.id()}"
+                               type="number"
+                               min="15"
+                               max="1440"
+                               step="15"
+                               class="minute-input"
+                               th:attr="data-minute-preview-id=${'duracaoPreview-' + vaga.id()},aria-describedby=${'duracaoPreview-' + vaga.id()}"
+                               th:field="*{duracaoMinutos}"
+                               required>
+                        <span class="field-unit">min</span>
+                    </div>
+                    <small th:id="${'duracaoPreview-' + vaga.id()}" class="minute-preview" aria-live="polite"></small>
 
                     <div class="label-with-help">
                         <label th:for="${'antecedenciaMinutos-' + vaga.id()}">Bloquear vaga antes da chegada</label>
@@ -73,7 +85,18 @@
                             <span class="help-tooltip-text" role="tooltip">Quando o ETA entrar nesse prazo, o sistema bloqueia a vaga para voce.</span>
                         </button>
                     </div>
-                    <input th:id="${'antecedenciaMinutos-' + vaga.id()}" type="number" min="0" max="240" th:field="*{antecedenciaMinutos}" required>
+                    <div class="field-with-unit">
+                        <input th:id="${'antecedenciaMinutos-' + vaga.id()}"
+                               type="number"
+                               min="0"
+                               max="240"
+                               class="minute-input"
+                               th:attr="data-minute-preview-id=${'antecedenciaPreview-' + vaga.id()},aria-describedby=${'antecedenciaPreview-' + vaga.id()}"
+                               th:field="*{antecedenciaMinutos}"
+                               required>
+                        <span class="field-unit">min</span>
+                    </div>
+                    <small th:id="${'antecedenciaPreview-' + vaga.id()}" class="minute-preview" aria-live="polite"></small>
 
                     <button type="submit">Reservar vaga</button>
                 </form>

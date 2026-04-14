@@ -284,6 +284,36 @@ img {
     visibility: visible;
 }
 
+.field-with-unit {
+    align-items: stretch;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.field-with-unit input {
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 0;
+}
+
+.field-unit {
+    align-items: center;
+    background: var(--field);
+    border: 1px solid var(--line);
+    border-left: 0;
+    border-radius: 0 6px 6px 0;
+    color: var(--muted);
+    display: inline-flex;
+    font-weight: 700;
+    justify-content: center;
+    min-height: 2.5rem;
+    padding: 0 0.75rem;
+}
+
+.minute-preview {
+    display: block;
+    min-height: 1.2rem;
+}
+
 .logout-form button {
     padding: 0.5rem 0.8rem;
 }
@@ -323,6 +353,10 @@ img {
     letter-spacing: 0;
     margin: 0 0 0.5rem;
     text-transform: uppercase;
+}
+
+.section-actions {
+    margin-bottom: 1rem;
 }
 
 .summary-grid,

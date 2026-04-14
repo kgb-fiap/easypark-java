@@ -62,8 +62,20 @@
                 <td>
                     <form th:action="@{/web/minhas-reservas/{id}/eta(id=${reserva.id()})}" method="post" class="inline-form">
                         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-                        <input name="minutos" type="number" min="0" max="240" required
-                               th:value="${reserva.etaMinutos() == null ? 10 : reserva.etaMinutos()}">
+                        <div>
+                            <div class="field-with-unit">
+                                <input name="minutos"
+                                       type="number"
+                                       min="0"
+                                       max="240"
+                                       class="minute-input"
+                                       th:attr="data-minute-preview-id=${'etaPreview-' + reserva.id()},aria-describedby=${'etaPreview-' + reserva.id()}"
+                                       required
+                                       th:value="${reserva.etaMinutos() == null ? 10 : reserva.etaMinutos()}">
+                                <span class="field-unit">min</span>
+                            </div>
+                            <small th:id="${'etaPreview-' + reserva.id()}" class="minute-preview" aria-live="polite"></small>
+                        </div>
                         <button type="submit">Atualizar chegada</button>
                     </form>
                 </td>
