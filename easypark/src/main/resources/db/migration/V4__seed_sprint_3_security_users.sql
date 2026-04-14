@@ -1,7 +1,7 @@
 MERGE INTO usuario u
 USING (
   SELECT
-    'Motorista' AS nome,
+    'Motorista Sprint 3' AS nome,
     'easypark.motorista@fiap.com.br' AS email,
     '$2a$10$xtFHZYDKZj0dTacmXq3mHuaAANfFL1DRMhj.p4rHTmqvy/XNvWiDW' AS senha_hash,
     'cliente' AS perfil
@@ -23,7 +23,7 @@ WHEN NOT MATCHED THEN
 MERGE INTO usuario u
 USING (
   SELECT
-    'Operador' AS nome,
+    'Operador Sprint 3' AS nome,
     'easypark.operador@fiap.com.br' AS email,
     '$2a$10$NEPjyA06X8fOWhySbl.X/Ol31SRZZ80F5Jrcraz1Sx5g0dzCbHMJG' AS senha_hash,
     'operador' AS perfil
@@ -45,7 +45,7 @@ WHEN NOT MATCHED THEN
 MERGE INTO usuario u
 USING (
   SELECT
-    'Admin' AS nome,
+    'Admin Sprint 3' AS nome,
     'easypark.admin@fiap.com.br' AS email,
     '$2a$10$dkh3ogloYYJwKihjv5zI5Oe63eJ78dfr.TSANVfK7C/amyJcAy8KG' AS senha_hash,
     'admin' AS perfil

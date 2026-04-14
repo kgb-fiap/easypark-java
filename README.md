@@ -323,6 +323,7 @@ As migrations ficam em `easypark/src/main/resources/db/migration`:
 - `V2__create_reserva_triggers_and_jobs.sql`: trigger de sensor, ETA e timeouts.
 - `V3__apply_sprint_2_database_evolution.sql`: evolucao entregue na Sprint 2.
 - `V4__seed_sprint_3_security_users.sql`: usuarios academicos da Sprint 3.
+- `V5__update_sprint_3_user_names.sql`: ajuste dos nomes exibidos dos usuarios academicos.
 
 O Flyway esta configurado com `baseline-on-migrate=true` e `baseline-version=3`. Isso permite conectar em um schema Oracle existente da Sprint 2, ja populado, sem apagar dados. Em schema limpo, as migrations V1 a V4 podem ser aplicadas em sequencia.
 
