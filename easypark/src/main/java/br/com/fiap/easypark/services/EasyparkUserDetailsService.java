@@ -2,8 +2,8 @@ package br.com.fiap.easypark.services;
 
 import br.com.fiap.easypark.entities.Usuario;
 import br.com.fiap.easypark.repositories.UsuarioRepository;
+import br.com.fiap.easypark.security.EasyparkUserDetails;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -29,11 +29,13 @@ public class EasyparkUserDetailsService implements UserDetailsService {
         Usuario usuario = repository.findByEmailIgnoreCase(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario nao encontrado"));
 
-        return User.withUsername(usuario.getEmail())
-                .password(usuario.getSenhaHash())
-                .authorities(authoritiesFor(usuario.getPerfil()))
-                .accountLocked(usuario.isBloqueado())
-                .build();
+        return new EasyparkUserDetails(
+                usuario.getEmail(),
+                usuario.getSenhaHash(),
+                usuario.getNome(),
+                !usuario.isBloqueado(),
+                authoritiesFor(usuario.getPerfil())
+        );
     }
 
     private List<SimpleGrantedAuthority> authoritiesFor(String perfil) {

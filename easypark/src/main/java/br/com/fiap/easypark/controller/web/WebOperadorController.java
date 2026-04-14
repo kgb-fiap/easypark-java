@@ -53,7 +53,7 @@ public class WebOperadorController {
                                         BindingResult bindingResult,
                                         RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
-            redirectAttributes.addAttribute("erro", "Revise os campos do evento de sensor.");
+            redirectAttributes.addAttribute("erro", "Revise os campos da leitura do sensor de presenca.");
             return "redirect:/web/operador";
         }
 

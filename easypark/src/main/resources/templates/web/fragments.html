@@ -10,7 +10,7 @@
         <a sec:authorize="hasAnyRole('OPERADOR','ADMIN')" th:href="@{/web/operador}" th:classappend="${active == 'operador'} ? ' active' : ''">Operador</a>
     </nav>
     <form th:action="@{/web/logout}" method="post" class="logout-form">
-        <span sec:authentication="name">usuario</span>
+        <span th:text="${displayName}">usuario</span>
         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
         <button type="submit">Sair</button>
     </form>

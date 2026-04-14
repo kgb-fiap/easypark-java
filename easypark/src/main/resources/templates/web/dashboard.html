@@ -12,7 +12,7 @@
     <section class="hero">
         <div>
             <p class="eyebrow">Motorista</p>
-            <h1 th:text="${'Para onde vamos, ' + username + '?'}">Para onde vamos?</h1>
+            <h1 th:text="${'Para onde vamos, ' + displayName + '?'}">Para onde vamos?</h1>
             <p>Informe um destino para encontrar estacionamentos cadastrados perto do local desejado.</p>
 
             <form th:action="@{/web/estacionamentos}" method="get" class="action-form">
