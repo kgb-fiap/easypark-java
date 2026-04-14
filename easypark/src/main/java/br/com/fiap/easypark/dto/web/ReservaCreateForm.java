@@ -1,5 +1,6 @@
 package br.com.fiap.easypark.dto.web;
 
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -29,4 +30,9 @@ public class ReservaCreateForm {
     @Min(value = 0, message = "O bloqueio antes da chegada nao pode ser negativo.")
     @Max(value = 240, message = "O bloqueio antes da chegada deve ser de no maximo 240 minutos.")
     private Integer antecedenciaMinutos = 15;
+
+    @AssertTrue(message = "Escolha um tempo de uso em intervalos de 15 minutos.")
+    public boolean isDuracaoEmIntervaloDeQuinzeMinutos() {
+        return duracaoMinutos == null || duracaoMinutos % 15 == 0;
+    }
 }

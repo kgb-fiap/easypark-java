@@ -390,7 +390,7 @@ Pagamento real ficou fora do escopo da Sprint 3.
 
 ### Validacoes
 
-- reserva: chegada prevista presente e futuro/presente, tempo de uso da vaga entre 15 e 1440 minutos, bloqueio antes da chegada entre 0 e 240 minutos;
+- reserva: chegada prevista presente e futuro/presente, tempo de uso da vaga entre 15 e 1440 minutos em intervalos de 15 minutos, bloqueio antes da chegada entre 0 e 240 minutos;
 - tempo ate chegar: valor entre 0 e 240 minutos;
 - leitura do sensor de presenca: sensor ativo, vaga derivada do sensor selecionado, leitura `LIVRE`, `OCUPADA` ou `DESCONHECIDO`, dados tecnicos com ate 4000 caracteres.
 

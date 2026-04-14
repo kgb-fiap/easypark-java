@@ -64,7 +64,7 @@
                             <span class="help-tooltip-text" role="tooltip">Tempo estimado que seu carro ficara na vaga.</span>
                         </button>
                     </div>
-                    <input th:id="${'duracaoMinutos-' + vaga.id()}" type="number" min="15" max="1440" th:field="*{duracaoMinutos}" required>
+                    <input th:id="${'duracaoMinutos-' + vaga.id()}" type="number" min="15" max="1440" step="15" th:field="*{duracaoMinutos}" required>
 
                     <div class="label-with-help">
                         <label th:for="${'antecedenciaMinutos-' + vaga.id()}">Bloquear vaga antes da chegada</label>

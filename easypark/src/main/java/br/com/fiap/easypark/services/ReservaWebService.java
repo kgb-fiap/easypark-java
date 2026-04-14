@@ -21,7 +21,7 @@ import java.util.List;
 
 @Service
 public class ReservaWebService {
-    private static final String DATE_FORMAT = "YYYY-MM-DD HH24:MI TZH:TZM";
+    private static final String DATE_FORMAT = "DD/MM/YYYY HH24:MI";
 
     private final EntityManager em;
     private final UsuarioRepository usuarioRepository;
