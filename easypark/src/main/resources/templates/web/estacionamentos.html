@@ -17,20 +17,14 @@
             <input id="destino" name="destino" type="search" th:value="${destino}"
                    placeholder="Ex.: Paulista, Centro, 01310-100">
 
-            <label for="lat">Latitude</label>
-            <input id="lat" name="lat" type="number" step="0.000001" th:value="${lat}">
-
-            <label for="lng">Longitude</label>
-            <input id="lng" name="lng" type="number" step="0.000001" th:value="${lng}">
-
             <button type="submit">Buscar</button>
             <a th:href="@{/web/estacionamentos}" class="secondary-link">Limpar</a>
         </form>
         <p class="muted" th:if="${resultado.referenciaPorEnderecoCadastrado()}">
-            Usando coordenadas de um endereco cadastrado parecido com o destino.
+            Usando um endereco cadastrado parecido com o destino.
         </p>
         <p class="muted" th:if="${resultado.latitudeReferencia() == null}">
-            Distancia exibida apenas quando o destino ou o estacionamento possui coordenadas suficientes.
+            Distancia exibida quando encontramos uma referencia de localizacao para o destino.
         </p>
     </section>
 
