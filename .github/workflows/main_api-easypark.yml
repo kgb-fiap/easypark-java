@@ -23,33 +23,15 @@ jobs:
         with:
           java-version: '21'
           distribution: 'microsoft'
-          cache: 'maven'
-          cache-dependency-path: 'easypark/pom.xml'
 
       - name: Build with Maven
-        working-directory: ./easypark
-        shell: pwsh
-        run: |
-          $attempts = 3
-
-          for ($i = 1; $i -le $attempts; $i++) {
-            mvn -B -U -DskipTests clean package
-            if ($LASTEXITCODE -eq 0) {
-              exit 0
-            }
-
-            if ($i -lt $attempts) {
-              Start-Sleep -Seconds (20 * $i)
-            }
-          }
-
-          exit $LASTEXITCODE
+        run: mvn clean install
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: java-app
-          path: '${{ github.workspace }}/easypark/target/*.jar'
+          path: '${{ github.workspace }}/target/*.jar'
 
   deploy:
     runs-on: windows-latest
@@ -67,9 +49,9 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_928DEC28040C4910A365F16507A45E57 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_46A99757CDE743389221DB0F32B24767 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_5ADC7B0B0CE645A8838E0B682C2C7B45 }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_65B5299E7FC0486FB00D39F336101DA0 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_31AFE487A34347CCA4B653B9493BD8C9 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_246FC4937DDD44E7A496BFED48948B5A }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
@@ -78,3 +60,4 @@ jobs:
           app-name: 'api-easypark'
           slot-name: 'Production'
           package: '*.jar'
+          
